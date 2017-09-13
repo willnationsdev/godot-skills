@@ -6,8 +6,12 @@
 #     is for locating nodes based on that criteria.
 extends "SkillDescendant.gd"
 
-# The set of targets for this Targeter.
+# The set of targets for this Targeter. Only used if is_state is false
 var targets = []
+
+# If true, SkillSystem processes get_targets and stores results for all Targeters of this type.
+# If false, each individual Targeter of this type finds its own targets
+var static = false setget _set_static, _is_static
 
 func _enter_tree():
     _skill_cache_list = "targeters"
@@ -18,3 +22,9 @@ func _enter_tree():
 # @return Array
 func get_targets():
     pass
+
+func _set_static(p_is_static):
+    static = p_is_static
+
+func _get_static():
+    return static

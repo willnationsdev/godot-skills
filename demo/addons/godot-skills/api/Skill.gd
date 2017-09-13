@@ -43,5 +43,5 @@ func test_properties(p_source, p_target, p_props):
 
 # Supplies the unique name for this Skill instance
 # DO REPLACE
-func get_skill_name():
+static func get_skill_name():
     return ""
