@@ -1,4 +1,4 @@
-extends "../Targeter.gd"
+extends "res://addons/godot-skills/api/Targeter.gd"
 
 export(NodePath) var node_path = ""
 
