@@ -5,9 +5,9 @@
 extends Node
 
 # Which property on the ancestor Skill are we adding this node to?
-var _skill_cache_list = ""
+var _skill_cache_list = "" setget ,
 # cached skill reference
-var skill = null
+var _skill = null setget , get_skill
 
 func _enter_tree():
     var node = self
@@ -24,3 +24,6 @@ func _exit_tree():
     # Remove this Targeter from the ancestor Skill to accommodate dynamic removal.
     if skill != null:
         skill.get(_skill_cache_list).erase(self)
+
+func get_skill():
+    return _skill
