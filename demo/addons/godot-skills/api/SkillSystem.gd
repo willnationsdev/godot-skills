@@ -9,6 +9,8 @@ extends Node
 var targeter_is_stale = []
 var regex = RegEx.new()
 
+var scenes_and_scripts = {}
+
 func get_targets(p_targeter_script, p_targeter_func):
     var group = p_targeter_script.get_path()
 
@@ -30,15 +32,20 @@ func get_targets(p_targeter_script, p_targeter_func):
     #         target.add_to_group(group)
 
 func _enter_tree():
-    var skill_json = File.new()
-    skill_json.open("res://skills.json", File.WRITE)
+    #var skill_json = File.new()
+    #skill_json.open("res://skills.json", File.WRITE)
+
     # defined at https://regex101.com/r/EQYwk1/1
     # Isolates files that have "Effect" or "Skill" at the end of the name
     # with a script or scene file extension
     regex.compile("/(?P<filename>(?P<title>\w*)(?P<type>(?:E|_e)ffect|(?:S|_s)kill|(?:T|_t)arteger))(?P<ext>(?P<script>\.gd|\.gdns|\.cs|\.vs)|(?P<scene>\.t?scn))\b)/")
     var files = {}
     _find_files("res://", files)
-    skill_json.store_string(to_json(_find_files()))
+    #skill_json.store_string(to_json(_find_files()))
+    for pathKey in files:
+        if scenes_and_scripts.has(files[pathKey][title])
+        if files[pathKey][]
+
 
 static func _find_files(p_dir, p_files):
     var dir = Directory.new()
@@ -54,3 +61,5 @@ static func _find_files(p_dir, p_files):
                     p_files[get_path() + "/" + file_name] = regexMatch.get_names()
             file_name = dir.get_next()
         dir.list_dir_end()
+
+func scene(p_name)
