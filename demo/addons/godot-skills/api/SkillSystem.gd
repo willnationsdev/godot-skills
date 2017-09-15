@@ -41,9 +41,11 @@ func _enter_tree():
     regex.compile("/(?P<filename>(?P<title>\w*)(?P<type>(?:E|_e)ffect|(?:S|_s)kill|(?:T|_t)arteger))(?P<ext>(?P<script>\.gd|\.gdns|\.cs|\.vs)|(?P<scene>\.t?scn))\b)/")
     var files = {}
     _find_files("res://", files)
+    # files should now be resource_path => dictionary of regex matches by name
     #skill_json.store_string(to_json(_find_files()))
     for pathKey in files:
-        if scenes_and_scripts.has(files[pathKey][title])
+        if not scenes_and_scripts.has(files[pathKey][title]):
+            scenes_and_scripts[files[pathKey][title]]
         if files[pathKey][]
 
 
