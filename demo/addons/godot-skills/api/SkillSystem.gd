@@ -4,11 +4,11 @@
 # their script or scene.
 extends Node
 
-# how to know when a targeter has already visited.
+# If a targeter has already visited and updated its static group, then targeter_is_stale[(targeter_script_path)] == false
+# If the SkillSystem has been notified that the group has become stale, then it will be 'true'
 var targeter_is_stale = []
 var regex = RegEx.new()
 
-# If p_is_stale is true, 
 func get_targets(p_targeter_script, p_targeter_func):
     var group = p_targeter_script.get_path()
 
@@ -35,7 +35,7 @@ func _enter_tree():
     # defined at https://regex101.com/r/EQYwk1/1
     # Isolates files that have "Effect" or "Skill" at the end of the name
     # with a script or scene file extension
-    regex.compile("/(?P<filename>(?P<title>\w*)(?P<type>Effect|Skill)(?P<ext>(?P<script>\.gd|\.gdns|\.cs|\.vs)|(?P<scene>\.t?scn))\b)/")
+    regex.compile("/(?P<filename>(?P<title>\w*)(?P<type>(?:E|_e)ffect|(?:S|_s)kill|(?:T|_t)arteger))(?P<ext>(?P<script>\.gd|\.gdns|\.cs|\.vs)|(?P<scene>\.t?scn))\b)/")
     var files = {}
     _find_files("res://", files)
     skill_json.store_string(to_json(_find_files()))
