@@ -9,7 +9,11 @@ extends Node
 var targeter_is_stale = []
 var regex = RegEx.new()
 
-var scenes_and_scripts = {}
+var skills = {}
+
+func _ready():
+    for name in skills:
+        print(name, ": ", skills[name])
 
 func get_targets(p_targeter_script, p_targeter_func):
     var group = p_targeter_script.get_path()
@@ -31,37 +35,39 @@ func get_targets(p_targeter_script, p_targeter_func):
     #     if not target.is_in_group(group):
     #         target.add_to_group(group)
 
-func _enter_tree():
-    #var skill_json = File.new()
-    #skill_json.open("res://skills.json", File.WRITE)
+# Find all scene files with "skill" at the end of their name and map their names to their scene filepaths,
+# e.g. fire_wall_skill.tscn and fireWallSkill.scn will be mapped to "fire_wall" and "fireWall" respectively.
+func _init():
+	#regex.compile("/(?P<filename>(?P<title>\\w*)(?:S|_s)kill\\.t?scn)\b/")
+	#print(regex.compile("(?P<filename>(?P<title>\\w*)(?:S|_s)kill\\.t?scn)\\b"))
+	regex.compile("(?P<title>\\w*)(?:_s|S)kill\\.t?scn")
+	var files = {}
+	var dirs = ["res://"]
+	while not dirs.empty():
+		var dir = Directory.new()
+		var dir_name = dirs.back()
+		dirs.pop_back()
+		if dir.open(dir_name) == OK:
+			dir.list_dir_begin()
+			var file_name = dir.get_next()
+			while true:
+				if file_name == "":
+					break;
+				# If a directory, then add to list of directories to visit
+				if dir.current_is_dir() and not file_name.begins_with("."):
+					dirs.push_back(dir.get_current_dir() + "/" + file_name)
+				# If a file, see if it's a Skill scene file. If so, map the skill name to the scene path
+				else:
+					var regexMatch = regex.search(file_name)
+					if regexMatch != null:
+						var skill_name = regexMatch.get_string("title")
+						var path = dir.get_current_dir() + "/" + file_name
+						skills[ skill_name ] = path
+						print("Adding ", skill_name, " mapping to ", path)
+				# Move on to the next file in this directory
+				file_name = dir.get_next()
+			# We've exhausted all files in this directory. Close the iterator.
+			dir.list_dir_end()
 
-    # defined at https://regex101.com/r/EQYwk1/1
-    # Isolates files that have "Effect" or "Skill" at the end of the name
-    # with a script or scene file extension
-    regex.compile("/(?P<filename>(?P<title>\w*)(?P<type>(?:E|_e)ffect|(?:S|_s)kill|(?:T|_t)arteger))(?P<ext>(?P<script>\.gd|\.gdns|\.cs|\.vs)|(?P<scene>\.t?scn))\b)/")
-    var files = {}
-    _find_files("res://", files)
-    # files should now be resource_path => dictionary of regex matches by name
-    #skill_json.store_string(to_json(_find_files()))
-    for pathKey in files:
-        if not scenes_and_scripts.has(files[pathKey][title]):
-            scenes_and_scripts[files[pathKey][title]]
-        if files[pathKey][]
-
-
-static func _find_files(p_dir, p_files):
-    var dir = Directory.new()
-    if dir.open(p_dir) == OK:
-        dir.list_dir_begin()
-        var file_name = dir.get_next()
-        while (file_name != ""):
-            if dir.current_is_dir():
-                _find_files(file_name, p_files)
-            else:
-                var regexMatch = regex.search(file_name)
-                if regexMatch != null:
-                    p_files[get_path() + "/" + file_name] = regexMatch.get_names()
-            file_name = dir.get_next()
-        dir.list_dir_end()
-
-func scene(p_name)
+func skill(p_name):
+	return load(skills[p_name])

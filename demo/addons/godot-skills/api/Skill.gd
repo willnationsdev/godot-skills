@@ -3,15 +3,14 @@
 #     definition of algorithms for gathering and manipulating nodes using Godot's Node Hierarchy.
 extends Node
 
+signal skill_applied(p_skill, p_source, p_params)
+
 var effects = []                        # cached list of effect nodes
 var targeters = []                      # cached list of targeter nodes
 
-func _ready():
-    pass
-
 # Acquires all targets from all Targeters and then applies all Effects to each target.
 # DO NOT REPLACE
-func apply(p_user):
+func apply(p_user, p_params):
     var targets = []
     for targeter in targeters:
         targets += targeter.get_targets()
@@ -21,7 +20,7 @@ func apply(p_user):
 
 # Acquires all targets from all Targeters and then reverts all Effects on each target.
 # DO NOT REPLACE
-func revert(p_user):
+func revert(p_user, p_params):
     var targets = []
     for targeter in targeters:
         targets += targeter.get_targets()

@@ -13,6 +13,14 @@ config_version=3
 config/name="GodotSkillsDemo"
 config/icon="res://icon.png"
 
+[autoload]
+
+skills="*res://addons/godot-skills/api/SkillSystem.gd"
+
+[editor_plugins]
+
+enabled=PoolStringArray( "godot-skills" )
+
 [gdnative]
 
 singletons=[  ]
