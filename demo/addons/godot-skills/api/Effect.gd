@@ -23,7 +23,7 @@ func revert(p_source, p_target):
 # protected (technically also public)
 
 # Initializes parent skill cache storage and function references for derived scripts.
-func _enter_tree():
+func _init():
     _skill_cache_list = "effects"
     _apply_func.set_instance(self)
     _revert_func.set_instance(self)

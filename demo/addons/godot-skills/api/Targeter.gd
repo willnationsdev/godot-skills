@@ -34,7 +34,7 @@ static func get_skill_system_path():
 
 # Acquires the targets for this Targeter
 # @return void
-func _enter_tree():
+func _init():
     _skill_cache_list = "targeters"
     _get_targets_func.set_instance(self)
     _bind()
