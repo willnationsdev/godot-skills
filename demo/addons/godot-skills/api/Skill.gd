@@ -5,8 +5,9 @@ extends Node
 
 signal skill_applied(p_skill, p_source, p_params)
 
-var effects = []                        # cached list of effect nodes
-var targeters = []                      # cached list of targeter nodes
+var ancestor_skill = null               # The Skill that owns this Skill, if applicable
+var effects = []                        # cached list of descendant Effect nodes
+var targeters = []                      # cached list of descendant Targeter nodes
 
 # Acquires all targets from all Targeters and then applies all Effects to each target.
 # DO NOT REPLACE
@@ -44,3 +45,6 @@ func test_properties(p_source, p_target, p_props):
 # DO REPLACE
 static func get_skill_name():
     return ""
+
+func set_ancestors(p_skill):
+    ancestor_skill = p_skill

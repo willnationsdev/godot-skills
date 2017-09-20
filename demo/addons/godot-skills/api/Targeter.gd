@@ -6,6 +6,9 @@
 extends "SkillDescendant.gd"
 
 # public
+var ancestor_skill = null               # The skill that owns this Targeter
+var ancestor_targeter = null            # The effect that owns this Targeter, if applicable
+var targeters = []                      # cached list of descendant Targeter nodes
 
 # @return If true, targets are processed script-wide in the SkillSystem
 func is_static():

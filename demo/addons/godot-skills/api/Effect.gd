@@ -2,9 +2,13 @@
 # Effects "apply" an effect, potentially using member variables set in advance as context.
 # Effects can be attached underneath Skill nodes for compositional construction of algorithms
 # in a Scene.
-extends "SkillDescendant.gd"
+extends Node
 
 # public 
+
+var ancestor_skill = null               # The skill that owns this Effect
+var ancestor_effect = null              # The effect that owns this Effect, if applicable
+var effects = []                        # cached list of descendant Effect nodes
 
 # Applies all child effects on the target and then its own effect.
 # DO NOT REPLACE
