@@ -6,8 +6,10 @@
 extends "SkillDescendant.gd"
 
 # public
-var ancestor_skill = null               # The skill that owns this Targeter
-var ancestor_targeter = null            # The effect that owns this Targeter, if applicable
+
+signal target_found(p_targeter, p_target)
+
+var ancestor = null                     # The Skill or Targeter that owns this Targeter
 var targeters = []                      # cached list of descendant Targeter nodes
 
 # @return If true, targets are processed script-wide in the SkillSystem
@@ -28,6 +30,7 @@ func get_targets():
     else:
         for target in _get_targets_func.call_func():
             r_targets[target] = null
+            emit_signal("target_found", self, target)
     return r_targets.keys()
 
 static func get_skill_system_path():

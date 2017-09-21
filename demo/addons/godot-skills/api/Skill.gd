@@ -3,11 +3,16 @@
 #     definition of algorithms for gathering and manipulating nodes using Godot's Node Hierarchy.
 extends Node
 
+# signals
 signal skill_applied(p_skill, p_source, p_params)
 
-var ancestor_skill = null               # The Skill that owns this Skill, if applicable
-var effects = []                        # cached list of descendant Effect nodes
-var targeters = []                      # cached list of descendant Targeter nodes
+# public
+
+var ancestor = null setget , get_ancestor   # The Skill that owns this Skill, optional, readonly
+var effects = [] setget , get_effects       # cached list of descendant Effect nodes, readonly
+var targeters = [] setget , get_targeters   # cached list of descendant Targeter nodes, readonly
+
+export var skill_name = "" setget set_skill_name, get_skill_name    # The name of the Skill, required
 
 # Acquires all targets from all Targeters and then applies all Effects to each target.
 # DO NOT REPLACE
@@ -18,6 +23,8 @@ func apply(p_user, p_params):
     for target in targets:
         for effect in effects:
             effect.apply(p_user, target)
+        if not _testing:
+            emit_signal("skill_applied", self, p_user, p_target)
 
 # Acquires all targets from all Targeters and then reverts all Effects on each target.
 # DO NOT REPLACE
@@ -28,6 +35,8 @@ func revert(p_user, p_params):
     for target in targets:
         for effect in effects:
             effect.revert(p_user, target)
+    if _testing:
+        _testing = false
 
 # Applies all effects to all targets.
 # Then acquires all desired properties from each target.
@@ -41,10 +50,11 @@ func revert(p_user, p_params):
 func test_properties(p_source, p_target, p_props):
     pass
 
-# Supplies the unique name for this Skill instance
-# DO REPLACE
-static func get_skill_name():
-    return ""
+# Basic Getters and Setters
+func set_skill_name(p_skill_name): return (skill_name = p_skill_name)
+func get_skill_name():             return skill_name
+func get_ancestor():               return ancestor
+func get_effects():                return effects
+func get_targeters():              return targeters
 
-func set_ancestors(p_skill):
-    ancestor_skill = p_skill
+var _testing = false            # If true, the current application of the Skill is meant for testing. Be prepared to revert and don't emit signals
