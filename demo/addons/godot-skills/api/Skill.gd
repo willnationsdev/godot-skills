@@ -17,26 +17,26 @@ export var skill_name = "" setget set_skill_name, get_skill_name    # The name o
 # Acquires all targets from all Targeters and then applies all Effects to each target.
 # DO NOT REPLACE
 func apply(p_user, p_params):
-    var targets = []
-    for targeter in targeters:
-        targets += targeter.get_targets()
-    for target in targets:
-        for effect in effects:
-            effect.apply(p_user, target)
-        if not _testing:
-            emit_signal("skill_applied", self, p_user, p_target)
+	var targets = []
+	for targeter in targeters:
+		targets += targeter.get_targets()
+	for target in targets:
+		for effect in effects:
+			effect.apply(p_user, target)
+		if not _testing:
+			emit_signal("skill_applied", self, p_user, p_target)
 
 # Acquires all targets from all Targeters and then reverts all Effects on each target.
 # DO NOT REPLACE
 func revert(p_user, p_params):
-    var targets = []
-    for targeter in targeters:
-        targets += targeter.get_targets()
-    for target in targets:
-        for effect in effects:
-            effect.revert(p_user, target)
-    if _testing:
-        _testing = false
+	var targets = []
+	for targeter in targeters:
+		targets += targeter.get_targets()
+	for target in targets:
+		for effect in effects:
+			effect.revert(p_user, target)
+	if _testing:
+		_testing = false
 
 # Applies all effects to all targets.
 # Then acquires all desired properties from each target.
@@ -48,7 +48,7 @@ func revert(p_user, p_params):
 #     "root/path/to/node2"  : etc.
 # }
 func test_properties(p_source, p_target, p_props):
-    pass
+	pass
 
 # Basic Getters and Setters
 func set_skill_name(p_skill_name): return (skill_name = p_skill_name)

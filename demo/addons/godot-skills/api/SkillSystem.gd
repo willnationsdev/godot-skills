@@ -12,28 +12,28 @@ var regex = RegEx.new()
 var skills = {}
 
 func _ready():
-    for name in skills:
-        print(name, ": ", skills[name])
+	for name in skills:
+		print(name, ": ", skills[name])
 
 func get_targets(p_targeter_script, p_targeter_func):
-    var group = p_targeter_script.get_path()
+	var group = p_targeter_script.get_path()
 
-    # If we already have a collective target that is up-to-date, return the targeted collection
-    if not targeter_is_stale[group]:
-        return get_nodes_in_group(group)
+	# If we already have a collective target that is up-to-date, return the targeted collection
+	if not targeter_is_stale[group]:
+		return get_nodes_in_group(group)
 
-    # Update the group to have all of the targets (and no other nodes)
-    var nodes = get_nodes_in_group(group)
-    nodes = p_targeter_func.call_func()
-    targeter_is_stale[group] = false
-    return nodes
+	# Update the group to have all of the targets (and no other nodes)
+	var nodes = get_nodes_in_group(group)
+	nodes = p_targeter_func.call_func()
+	targeter_is_stale[group] = false
+	return nodes
 
-    # for node in get_nodes_in_group(group):
-    #     if not node in targets:
-    #         node.remove_from_group(group)
-    # for target in targets:
-    #     if not target.is_in_group(group):
-    #         target.add_to_group(group)
+	# for node in get_nodes_in_group(group):
+	#     if not node in targets:
+	#         node.remove_from_group(group)
+	# for target in targets:
+	#     if not target.is_in_group(group):
+	#         target.add_to_group(group)
 
 # Find all scene files with "skill" at the end of their name and map their names to their scene filepaths,
 # e.g. fire_wall_skill.tscn and fireWallSkill.scn will be mapped to "fire_wall" and "fireWall" respectively.
@@ -43,6 +43,7 @@ func _init():
 	regex.compile("(?P<title>\\w*)(?:_s|S)kill\\.t?scn")
 	var files = {}
 	var dirs = ["res://"]
+	var first = true
 	while not dirs.empty():
 		var dir = Directory.new()
 		var dir_name = dirs.back()
@@ -51,6 +52,8 @@ func _init():
 			dir.list_dir_begin()
 			var file_name = dir.get_next()
 			while true:
+				if not dir_name == "res://":
+					first = false
 				if file_name == "":
 					break;
 				# If a directory, then add to list of directories to visit
@@ -60,8 +63,9 @@ func _init():
 				else:
 					var regexMatch = regex.search(file_name)
 					if regexMatch != null:
+						print("found file named: ", file_name)
 						var skill_name = regexMatch.get_string("title")
-						var path = dir.get_current_dir() + "/" + file_name
+						var path = dir.get_current_dir() + ("/" if not first else "") + file_name
 						skills[ skill_name ] = path
 						print("Adding ", skill_name, " mapping to ", path)
 				# Move on to the next file in this directory

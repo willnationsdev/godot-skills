@@ -8,7 +8,7 @@
 # DamageEffect:         Subtracts an "amount" from a property on the target. The default property name is "health".
 #                       Has boolean "percentage": if true, "amount" is multiplied against the property and then subtracted (100 subtracts all).
 # RestoreEffect:        Adds an "amount" to a property on the target, but not more than some maximum value. The 
-#                       default value for the property and max property are "health" and "max_health", respectively.
+#                       default values for the property and max property are "health" and "max_health", respectively.
 #                       Has boolean "percentage": if true, "amount" is multiplied against the max property and then added (100 restores all).
 # 
 # 
@@ -25,54 +25,54 @@ var effects = [] setget , get_effects           # cached list of descendant Effe
 # Applies all child effects on the target and then its own effect.
 # DO NOT REPLACE
 func apply(p_source, p_target):
-    for child in _child_effects:
-        child.apply(p_source, p_target)
-    _apply_func.call_func(p_source, p_target)
-    if not _testing:
-        emit_signal("effect_applied", self, p_source, p_target)
+	for child in _child_effects:
+		child.apply(p_source, p_target)
+	_apply_func.call_func(p_source, p_target)
+	if not _testing:
+		emit_signal("effect_applied", self, p_source, p_target)
 
 # Reverts its effect on the target and then reverts all child effects.
 # DO NOT REPLACE
 func revert(p_source, p_target):
-    _revert_func.call_func(p_source, p_target)
-    for child in _child_effects:
-        child.revert(p_source, p_target)
-    if _testing:
-        _testing = false
+	_revert_func.call_func(p_source, p_target)
+	for child in _child_effects:
+		child.revert(p_source, p_target)
+	if _testing:
+		_testing = false
 
 # protected
 
 # Initializes parent skill cache storage and function references for derived scripts.
 func _init():
-    _skill_cache_list = "effects"
-    _apply_func.set_instance(self)
-    _revert_func.set_instance(self)
-    _bind()
+	_skill_cache_list = "effects"
+	_apply_func.set_instance(self)
+	_revert_func.set_instance(self)
+	_bind()
 
 # Initializes child Effect cache and function references for derived scripts.
 func _ready():
-    for child in get_children():
-        if child extends "Effect.gd":
-            _child_effects[] = child
+	for child in get_children():
+		if child.get_script() == load("Effect.gd"):
+			_child_effects.append(child)
 
 # Helper function for derived Effects to easily get set up.
 func _bind(p_apply_name = "_apply", p_revert_name = "_revert"):
-    _apply_func.set_function(p_apply_name)
-    _revert_func.set_function(p_revert_name)
+	_apply_func.set_function(p_apply_name)
+	_revert_func.set_function(p_revert_name)
 
 # null base implementation, to be overridden
 func _apply(p_source, p_target):
-    pass
+	pass
 
 # null base implementation, to be overridden
 func _revert(p_source, p_target):
-    pass
+	pass
 
 func get_skill():
-    var node = self
-    while not node extends "Skill.gd":
-        node = node.ancestor
-    return node
+	var node = self
+	while node.get_script() != load("Skill.gd"):
+		node = node.ancestor
+	return node
 
 # private
 
