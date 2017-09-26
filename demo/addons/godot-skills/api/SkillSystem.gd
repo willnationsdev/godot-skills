@@ -4,42 +4,29 @@
 # their script or scene.
 extends Node
 
-# If a targeter has already visited and updated its static group, then targeter_is_stale[(targeter_script_path)] == false
-# If the SkillSystem has been notified that the group has become stale, then it will be 'true'
-var targeter_is_stale = []
-var regex = RegEx.new()
+##### SIGNALS #####
+signal effect_applied(p_effect, p_source, p_target)
+signal skill_activated(p_skill, p_source, p_params)
+signal target_found(p_targeter, p_target)
 
+##### CONSTANTS #####
+
+##### EXPORTS #####
+
+##### MEMBERS #####
 var skills = {}
+
+##### NOTIFICATIONS #####
 
 func _ready():
 	for name in skills:
 		print(name, ": ", skills[name])
 
-func get_targets(p_targeter_script, p_targeter_func):
-	var group = p_targeter_script.get_path()
-
-	# If we already have a collective target that is up-to-date, return the targeted collection
-	if not targeter_is_stale[group]:
-		return get_nodes_in_group(group)
-
-	# Update the group to have all of the targets (and no other nodes)
-	var nodes = get_nodes_in_group(group)
-	nodes = p_targeter_func.call_func()
-	targeter_is_stale[group] = false
-	return nodes
-
-	# for node in get_nodes_in_group(group):
-	#     if not node in targets:
-	#         node.remove_from_group(group)
-	# for target in targets:
-	#     if not target.is_in_group(group):
-	#         target.add_to_group(group)
-
-# Find all scene files with "skill" at the end of their name and map their names to their scene filepaths,
-# e.g. fire_wall_skill.tscn and fireWallSkill.scn will be mapped to "fire_wall" and "fireWall" respectively.
+# Find all scene files with "skill" at the end of their name and map their names to their scene filepaths, example:
+# "fire_wall"	: res://fire_wall_skill.tscn
+# "fireWall"  	: res://dir/fireWallSkill.scn
 func _init():
-	#regex.compile("/(?P<filename>(?P<title>\\w*)(?:S|_s)kill\\.t?scn)\b/")
-	#print(regex.compile("(?P<filename>(?P<title>\\w*)(?:S|_s)kill\\.t?scn)\\b"))
+	var regex = RegEx.new()
 	regex.compile("(?P<title>\\w*)(?:_s|S)kill\\.t?scn")
 	var files = {}
 	var dirs = ["res://"]
@@ -51,11 +38,9 @@ func _init():
 		if dir.open(dir_name) == OK:
 			dir.list_dir_begin()
 			var file_name = dir.get_next()
-			while true:
+			while file_name != "":
 				if not dir_name == "res://":
 					first = false
-				if file_name == "":
-					break;
 				# If a directory, then add to list of directories to visit
 				if dir.current_is_dir() and not file_name.begins_with("."):
 					dirs.push_back(dir.get_current_dir() + "/" + file_name)
@@ -73,5 +58,9 @@ func _init():
 			# We've exhausted all files in this directory. Close the iterator.
 			dir.list_dir_end()
 
-func skill(p_name):
-	return load(skills[p_name])
+##### METHODS #####
+
+func skill(p_name, p_preload = true):
+	return preload(skills[p_name]) if p_preload else load(skill[p_name])
+
+##### SETTERS AND GETTERS #####

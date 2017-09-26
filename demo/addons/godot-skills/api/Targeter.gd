@@ -5,49 +5,21 @@
 #     is for locating nodes based on that criteria.
 extends "SkillDescendant.gd"
 
-# public
-
+##### SIGNALS #####
 signal target_found(p_targeter, p_target)
 
-var ancestor = null                     # The Skill or Targeter that owns this Targeter
-var targeters = []                      # cached list of descendant Targeter nodes
+##### CONSTANTS #####
+const Util = preload("GodotSkillUtilities.gd")
 
-# @return If true, targets are processed script-wide in the SkillSystem
-func is_static():
-    return static
+##### EXPORTS #####
 
-# Acquires the targets for this Targeter and its children
-# @return Array
-func get_targets():
-    var r_targets = {} # Assures we'll have a unique list
-    for child in _child_targeters:
-        for target in child.get_targets():
-            r_targets[target] = null
-    if static:
-        get_node(get_skill_system_path()).get_targets(get_script(), _get_targets_func)
-        for target in get_nodes_in_group(get_script().get_path()):
-            r_targets[target] = null
-    else:
-        for target in _get_targets_func.call_func():
-            r_targets[target] = null
-            emit_signal("target_found", self, target)
-    return r_targets.keys()
+##### MEMBERS #####
+var skill = null            # The Skill or Targeter that owns this Targeter
+var targeters = []          # cached list of descendant Targeter nodes
+var _child_targeters = []   # Targeter children cache
+var _targets = []           # The set of targets for this Targeter. Only used if `static` is false
 
-static func get_skill_system_path():
-    return "/skill_system"
-
-# protected (technically also public)
-
-# Acquires the targets for this Targeter
-# @return void
-func _init():
-    _skill_cache_list = "targeters"
-    _get_targets_func.set_instance(self)
-    _bind()
-
-    # Update the Skill System to let it know that we need to update this script's targets
-    if static:
-        get_node(get_skill_system_path()).targeter_is_stale[get_script().get_path()] = true
+##### NOTIFICATIONS #####
 
 # Initializes child Targeter cache
 func _ready():
@@ -55,20 +27,27 @@ func _ready():
         if child extends "Targeter.gd":
             _child_targeters[] = child
 
-# Helper function for derived Targeters to easily get set up.
-func _bind(p_target_name = "_target"):
-    _get_targets_func.set_function(p_target_name)
-
-# null base implementation
+# Custom Notification
+# null base implementation, to be overridden
+# Acquires targets for this Targeter
 func _target():
     pass
 
-# If true, SkillSystem processes get_targets and stores results for all Targeters of this type.
-# If false, each individual Targeter of this type finds its own targets
-var static = false setget , is_static
+##### METHODS #####
 
-# private (technically also protected)
+# Acquires the targets for this Targeter and its children
+func get_targets():
+    var r_targets = {} # Assures we'll have a unique list
 
-var _child_targeters = [] setget ,          # Targeter children cache
-var _get_targets_func = FuncRef() setget ,  # Gathers targets for this Targeter.
-var _targets = [] setget ,                  # The set of targets for this Targeter. Only used if `static` is false
+    for child in _child_targeters:
+        for target in child.get_targets():
+            r_targets[target] = null
+
+    for target in _target():
+        r_targets[target] = null
+        emit_signal("target_found", self, target)
+        Util.get_skill_system().emit_signal("target_found", self, target)
+
+    return r_targets.keys()
+
+##### SETTERS AND GETTERS  #####
