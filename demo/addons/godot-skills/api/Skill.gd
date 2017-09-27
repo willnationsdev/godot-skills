@@ -31,7 +31,13 @@ var _testing = false                                   # True = Skill is testing
 func _enter_tree():
 	var parent = get_parent()
 	if parent and parent is get_script():
-		parent.skills.append(self)
+        parent.skills.append(self)
+
+# Remove self from parent Skill's cache of Skill children, if needed
+func _exit_tree():
+    var parent = get_parent()
+    if parent and parent is get_script():
+        parent.skills.erase(self)
 
 # Triggers the use of this skill.
 # - Custom Notification
@@ -49,31 +55,17 @@ func activate(p_user, p_params):
 # Acquires all targets from all Targeters and then applies all Effects to each target.
 # DO NOT REPLACE
 func apply(p_user, p_params):
-	if not active and not _testing: return
-	var targets = []
-	for targeter in targeters:
-		targets += targeter.get_targets()
-	for target in targets:
-		for effect in effects:
-			effect.apply(p_user, target)
-		if not _testing:
-			emit_signal("skill_applied", self, p_user, p_target)
-			Util.get_skill_system().emit_signal("skill_applied", self, p_user, p_target)
+	if not (active or _testing): return
+    var targets = _skill_get_targets()
+    _skill_apply_(targets)
 
 # Acquires all targets from all Targeters and then reverts all Effects on each target.
 # DO NOT REPLACE
 func revert(p_user, p_params):
 	if not _testing: return
-	var targets = []
-	for targeter in targeters:
-		targets += targeter.get_targets()
-	for target in targets:
-		for effect in effects:
-			effect.revert(p_user, target)
-	if _testing:
-		_testing = false
+    var targets = _skill_get_targets()
+    _skill_revert(targets)
 
-# TODO:
 # Applies all effects to all targets.
 # Then acquires all desired properties from each target.
 # The properties are compiled into a Dictionary of Dictionaries.
@@ -83,11 +75,59 @@ func revert(p_user, p_params):
 #     "root/path/to/node"   : { "prop1" : value1, "prop2" : value2, etc. },
 #     "root/path/to/node2"  : etc.
 # }
-func test_properties(p_source, p_target, p_props):
-	_testing = true
+func test_properties(p_user, p_params, p_props):
+    # Set testing flag, get targets, and apply effects to them.
+    _testing = true
+    var targets = _skill_get_targets()
+    _skill_apply(targets)
+
+    # Initialize the result set.
+    var result = {}
+
+    # For each target, save their node path as a key if they are in the tree.
+    for target in targets:
+        if target.is_inside_tree():
+            var path = target.get_path()
+            result[path] = {}
+
+            # Get the target's property names.
+            var props = target.get_property_list()
+
+            # For each property we want, if the target has that property,
+            # save that property at target_node_path/property_name.
+            for prop in p_props:
+                if prop in props:
+                    result[path][prop] = target.get(prop)
+    
+    # Return targets to normal. Clear testing flag (since we are done) and
+    # return tested properties.
+    _skill_revert(targets)
+    _testing = false
+    return result
 
 func enable(): active = true       # for convenience
 func disable(): active = false     # for convenience
+
+func _skill_get_targets():
+    var targets = {}
+    # Ensure that we don't end up with duplicate targets from multiple targeter sources
+    for targeter in targeters:
+        for target in targeter.get_targets():
+            targets[target] = null
+    return targets.keys()
+
+func _skill_apply(p_targets):
+	for target in p_targets:
+		for effect in effects:
+			effect.apply(p_user, target)
+		if not _testing:
+            emit_signal("skill_applied", self, p_user, p_target)
+
+func _skill_revert(p_targets):
+	for target in targets:
+		for effect in effects:
+			effect.revert(p_user, target)
+
 
 ##### SETTERS AND GETTERS #####
 func set_skill_name(p_skill_name): skill_name = p_skill_name

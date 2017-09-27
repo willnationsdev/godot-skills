@@ -20,7 +20,7 @@ signal target_found(p_targeter, p_target)
 
 ##### MEMBERS #####
 var targeters = []          # cached list of descendant Targeter nodes
-var _targets = []           # The set of targets for this Targeter.
+var _targets = []           # The set of targets for this Targeter. For optional caching.
 
 ##### NOTIFICATIONS #####
 
