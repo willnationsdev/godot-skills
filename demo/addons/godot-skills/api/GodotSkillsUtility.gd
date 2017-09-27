@@ -1,3 +1,5 @@
+# DEPRECATED
+
 extends Reference
 
 const Effect = preload("Effect.gd")

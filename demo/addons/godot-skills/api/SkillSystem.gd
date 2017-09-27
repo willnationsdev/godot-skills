@@ -1,3 +1,5 @@
+# DEPRECATED
+#
 # SkillSystem is meant to be an Autoload Singleton.
 # It enables all references to Skills to automatically
 # use their name rather than their full path to acquire
@@ -5,9 +7,6 @@
 extends Node
 
 ##### SIGNALS #####
-signal effect_applied(p_effect, p_source, p_target)
-signal skill_activated(p_skill, p_source, p_params)
-signal target_found(p_targeter, p_target)
 
 ##### CONSTANTS #####
 
@@ -61,6 +60,6 @@ func _init():
 ##### METHODS #####
 
 func skill(p_name, p_preload = true):
-	return preload(skills[p_name]) if p_preload else load(skill[p_name])
+	return load(skills[p_name])
 
 ##### SETTERS AND GETTERS #####

@@ -3,51 +3,52 @@
 #     as SkillUsers are added or removed from the tree.
 # All depends on the criteria sought after and what the most efficient algorithm
 #     is for locating nodes based on that criteria.
-extends "SkillDescendant.gd"
+#
+# Examples of a Targeter may include...
+# Area2DTargeter: A scene with an Area2D root is instanced and attached
+#                 to the node at the given NodePath and stored as a variable.
+#                 Signals for area_entered and body_entered are then relayed to
+#                 target_found connections for the Targeter
+extends Node
 
 ##### SIGNALS #####
 signal target_found(p_targeter, p_target)
 
 ##### CONSTANTS #####
-const Util = preload("GodotSkillUtilities.gd")
 
 ##### EXPORTS #####
 
 ##### MEMBERS #####
-var skill = null            # The Skill or Targeter that owns this Targeter
 var targeters = []          # cached list of descendant Targeter nodes
-var _child_targeters = []   # Targeter children cache
-var _targets = []           # The set of targets for this Targeter. Only used if `static` is false
+var _targets = []           # The set of targets for this Targeter.
 
 ##### NOTIFICATIONS #####
 
-# Initializes child Targeter cache
-func _ready():
-    for child in get_children():
-        if child extends "Targeter.gd":
-            _child_targeters[] = child
+func _enter_tree():
+	get_parent().targeters.append(self)
+
+func _exit_tree():
+	get_parent().targeters.erase(self)
 
 # Custom Notification
 # null base implementation, to be overridden
 # Acquires targets for this Targeter
-func _target():
-    pass
+func _get_targets(p_params):
+	pass
 
 ##### METHODS #####
 
 # Acquires the targets for this Targeter and its children
-func get_targets():
-    var r_targets = {} # Assures we'll have a unique list
+func get_targets(p_params):
+	var r_targets = {} # Assures we'll have a unique list
 
-    for child in _child_targeters:
-        for target in child.get_targets():
-            r_targets[target] = null
+	for child in _child_targeters:
+		for target in child.get_targets():
+			r_targets[target] = null
 
-    for target in _target():
-        r_targets[target] = null
-        emit_signal("target_found", self, target)
-        Util.get_skill_system().emit_signal("target_found", self, target)
+	for target in _get_targets():
+		r_targets[target] = null
 
-    return r_targets.keys()
+	return r_targets.keys()
 
 ##### SETTERS AND GETTERS  #####

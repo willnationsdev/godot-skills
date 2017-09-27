@@ -10,32 +10,46 @@
 extends Node
 
 ##### SIGNALS #####
+signal skill_activated(p_skill, p_source, p_params)                 # Skill is turned on
+signal skill_applied(p_skill, p_source, p_params, p_target)         # Skill is directly affecting a target
 
 ##### CONSTANTS #####
-const Util = preload("GodotSkillUtilities.gd")
 
 ##### EXPORTS #####
 export var skill_name = "" setget set_skill_name, get_skill_name    # The name of the Skill, required
+export var active = true setget set_active, is_active               # If true, the skill will proactively apply to targets
 
 ##### MEMBERS #####
-var ancestor = null setget , get_ancestor   # The Skill that owns this Skill, optional, readonly
-var effects = [] setget , get_effects       # cached list of descendant Effect nodes, readonly
-var targeters = [] setget , get_targeters   # cached list of descendant Targeter nodes, readonly
-var _testing = false                        # If true, the current application of the Skill is meant for testing. Be prepared to revert and don't emit signals
+var skills = [] setget , get_skills                    # cached list of child Skill nodes, readonly
+var effects = [] setget , get_effects                  # cached list of child Effect nodes, readonly
+var targeters = [] setget , get_targeters              # cached list of child Targeter nodes, readonly
+var _testing = false                                   # True = Skill is testing properties. Will revert. Don't emit signals.
 
 ##### NOTIFICATIONS #####
 
-# 
+# Add self to parent Skill's cache of Skill children, if needed
+func _enter_tree():
+	var parent = get_parent()
+	if parent and parent is get_script():
+		parent.skills.append(self)
+
+# Triggers the use of this skill.
 # - Custom Notification
 # - null base implemention, to be overridden
 func _activate(p_user, p_params):
-    pass
+	pass
 
 ##### METHODS #####
+
+func activate(p_user, p_params):
+	active = true
+	_activate(p_user, p_params)
+	emit_signal("skill_activated", self, p_user, p_params)
 
 # Acquires all targets from all Targeters and then applies all Effects to each target.
 # DO NOT REPLACE
 func apply(p_user, p_params):
+	if not active and not _testing: return
 	var targets = []
 	for targeter in targeters:
 		targets += targeter.get_targets()
@@ -44,10 +58,12 @@ func apply(p_user, p_params):
 			effect.apply(p_user, target)
 		if not _testing:
 			emit_signal("skill_applied", self, p_user, p_target)
+			Util.get_skill_system().emit_signal("skill_applied", self, p_user, p_target)
 
 # Acquires all targets from all Targeters and then reverts all Effects on each target.
 # DO NOT REPLACE
 func revert(p_user, p_params):
+	if not _testing: return
 	var targets = []
 	for targeter in targeters:
 		targets += targeter.get_targets()
@@ -68,11 +84,16 @@ func revert(p_user, p_params):
 #     "root/path/to/node2"  : etc.
 # }
 func test_properties(p_source, p_target, p_props):
-	pass
+	_testing = true
+
+func enable(): active = true       # for convenience
+func disable(): active = false     # for convenience
 
 ##### SETTERS AND GETTERS #####
-func set_skill_name(p_skill_name): return (skill_name = p_skill_name)
+func set_skill_name(p_skill_name): skill_name = p_skill_name
+func set_active(p_enable_active):  active = p_enable_active
 func get_skill_name():             return skill_name
-func get_ancestor():               return ancestor
+func get_skill():                  return skill
 func get_effects():                return effects
 func get_targeters():              return targeters
+func is_active():                  return active

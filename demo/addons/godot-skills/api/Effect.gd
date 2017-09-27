@@ -10,7 +10,8 @@
 # RestoreEffect:        Adds an "amount" to a property on the target, but not more than some maximum value. The 
 #                       default values for the property and max property are "health" and "max_health", respectively.
 #                       Has boolean "percentage": if true, "amount" is multiplied against the max property and then added (100 restores all).
-# 
+# TriggerSkillEffect:   Activates a Skill when the Effect is applied. The source of the Skill matches the Effect's.
+#                       The Skill in question can be attached as a child of the Effect.
 # 
 # 
 extends Node
@@ -19,23 +20,20 @@ extends Node
 signal effect_applied(p_effect, p_source, p_target)
 
 ##### CONSTANTS #####
-const Util = preload("GodotSkillUtilities.gd")
 
 ##### EXPORTS #####
 
 ##### MEMBERS #####
-var skill = null  		# The Skill that owns this Effect, required
-var effects = []		# The Effects owned by this Effect, optional
+var effects = []		# The child Effects owned by this Effect, optional
 var _testing = false 	# If true, the current application of the Effect is meant for testing. Be prepared to revert and don't emit signals
 
 ##### NOTIFICATIONS #####
 
-# Initializes skill and effect caches
+# Updates parent Effect cache
 func _enter_tree():
 	get_parent().effects.append(self)
-	skill = Util.fetch_ancestor_skill(self)
 
-# Updates effect cache
+# Updates parent Effect cache
 func _exit_tree():
 	get_parent().effects.erase(self)
 
@@ -61,7 +59,6 @@ func apply(p_source, p_target):
 	_apply(p_source, p_target)
 	if not _testing:
 		emit_signal("effect_applied", self, p_source, p_target)
-		Util.get_skill_system().emit_signal("effect_applied", self, p_source, p_target)
 
 # Reverts its effect on the target and then reverts all child effects.
 # DO NOT REPLACE
