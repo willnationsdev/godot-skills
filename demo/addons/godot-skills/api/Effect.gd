@@ -17,15 +17,15 @@
 extends Node
 
 ##### SIGNALS #####
-signal effect_applied(p_effect, p_source, p_target)
+signal effect_applied(p_effect, p_source, p_target, p_params)
 
 ##### CONSTANTS #####
 
 ##### EXPORTS #####
 
 ##### MEMBERS #####
-var effects = []		# The child Effects owned by this Effect, optional
-var _testing = false 	# If true, the current application of the Effect is meant for testing. Be prepared to revert and don't emit signals
+var effects = []		# The child Effects owned by this Effect, optional. Will automatically apply prior to this.
+var _testing = false 	# If true, the current application of the Effect is meant for testing. Be prepared to revert and don't emit signals.
 
 ##### NOTIFICATIONS #####
 
@@ -40,32 +40,32 @@ func _exit_tree():
 # Applies some change from a source to a target
 # - Custom Notification
 # - null base implementation, to be overridden
-func _apply(p_source, p_target):
+func _apply(p_source, p_target, p_params):
 	pass
 
 # Reverts a change previously applied from a source to a target
 # - Custom Notification
 # - null base implementation, to be overridden
-func _revert(p_source, p_target):
+func _revert(p_source, p_target, p_params):
 	pass
 
 ##### METHODS #####
 
 # Applies all child effects on the target and then its own effect.
 # DO NOT REPLACE
-func apply(p_source, p_target):
+func apply(p_source, p_target, p_params):
 	for child in _child_effects:
-		child.apply(p_source, p_target)
-	_apply(p_source, p_target)
+		child.apply(p_source, p_target, p_params)
+	_apply(p_source, p_target, p_params)
 	if not _testing:
-		emit_signal("effect_applied", self, p_source, p_target)
+		emit_signal("effect_applied", self, p_source, p_target, p_params)
 
 # Reverts its effect on the target and then reverts all child effects.
 # DO NOT REPLACE
-func revert(p_source, p_target):
-	_revert(p_source, p_target)
+func revert(p_source, p_target, p_params):
+	_revert(p_source, p_target, p_params)
 	for child in _child_effects:
-		child.revert(p_source, p_target)
+		child.revert(p_source, p_target, p_params)
 	if _testing:
 		_testing = false
 

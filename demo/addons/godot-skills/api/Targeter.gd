@@ -12,21 +12,23 @@
 extends Node
 
 ##### SIGNALS #####
-signal target_found(p_targeter, p_target)
+signal target_found(p_targeter, p_target) # For REACTIVE targeting
 
 ##### CONSTANTS #####
 
 ##### EXPORTS #####
 
 ##### MEMBERS #####
-var targeters = []          # cached list of descendant Targeter nodes
-var _targets = []           # The set of targets for this Targeter. For optional caching.
+var targeters = []          # Cached list of child Targeter nodes
+var _targets = []           # For optional caching of PROACTIVE targeting
 
 ##### NOTIFICATIONS #####
 
+# Updates parent Targeter cache
 func _enter_tree():
 	get_parent().targeters.append(self)
 
+# Updates parent Targeter cache
 func _exit_tree():
 	get_parent().targeters.erase(self)
 
@@ -50,5 +52,11 @@ func get_targets(p_params):
 		r_targets[target] = null
 
 	return r_targets.keys()
+
+func _fetch_skill_owner():
+	var parent = get_parent()
+	while parent and not parent is preload("Skill.gd"):
+		parent = parent.get_parent()
+	return parent
 
 ##### SETTERS AND GETTERS  #####

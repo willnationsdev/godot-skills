@@ -1,13 +1,35 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=7 format=2]
 
-[ext_resource path="res://addons/godot-skills/api/Skill.gd" type="Script" id=1]
+[ext_resource path="res://print_name_skill.gd" type="Script" id=1]
 [ext_resource path="res://addons/godot-skills/api/icons/icon_skill.png" type="Texture" id=2]
+[ext_resource path="res://addons/godot-skills/node-extensions/Targeters/node_path_targeter.gd" type="Script" id=3]
+[ext_resource path="res://addons/godot-skills/api/icons/icon_targeter.png" type="Texture" id=4]
+[ext_resource path="res://addons/godot-skills/node-extensions/Effects/print_name_effect.gd" type="Script" id=5]
+[ext_resource path="res://addons/godot-skills/api/icons/icon_effect.png" type="Texture" id=6]
 
 [node name="Skill" type="Node"]
 
 script = ExtResource( 1 )
 __meta__ = {
 "_editor_icon": ExtResource( 2 )
+}
+skill_name = "print_target_name"
+enabled = true
+auto_deactivate_on_disable = true
+
+[node name="node_path" type="Node" parent="."]
+
+script = ExtResource( 3 )
+__meta__ = {
+"_editor_icon": ExtResource( 4 )
+}
+node_path = null
+
+[node name="print_name" type="Node" parent="."]
+
+script = ExtResource( 5 )
+__meta__ = {
+"_editor_icon": ExtResource( 6 )
 }
 
 
