@@ -15,6 +15,7 @@ extends Node
 signal target_found(p_targeter, p_target) # For REACTIVE targeting
 
 ##### CONSTANTS #####
+const Skills = preload("GodotSkillsUtility.gd")
 
 ##### EXPORTS #####
 
@@ -52,11 +53,5 @@ func get_targets(p_params):
 		r_targets[target] = null
 
 	return r_targets.keys()
-
-func _fetch_skill_owner():
-	var parent = get_parent()
-	while parent and not parent is preload("Skill.gd"):
-		parent = parent.get_parent()
-	return parent
 
 ##### SETTERS AND GETTERS  #####
