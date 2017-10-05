@@ -1,44 +1,31 @@
 extends Node
 
 ##### SIGNALS #####
-signal condition_triggered(p_condition, p_skill) # Emitted just after the skill has been executed
-signal ready_to_expire(p_condition)
+signal triggered(p_condition, p_skill) # Emitted just after the skill has been executed
+signal expired(p_condition)
 
 ##### CONSTANTS #####
 
 ##### EXPORTS #####
-export(NodePath) var skill = null
+export(NodePath) var skill = null		#For design-time creation of conditions
+export(bool) var hidden = false			#if hidden, not added to SkillUser cache
 
 ##### MEMBERS #####
 
 ##### NOTIFICATIONS #####
 
 func _enter_tree():
-	var parent = get_parent()
-	if parent:
-		if "conditions" in parent.get_property_list():
-			parent.conditions.append(self)
-		connect("ready_to_expire", parent, "on_condition_expired")
+	_update_parent(true)
 
 func _exit_tree():
-	var parent = get_parent()
-	if parent and ("conditions" in parent.get_property_list()):
-		parent.conditions.erase(self)
-
-func _trigger():
-	pass
-
-func _expired():
-	pass
+	_update_parent(false)
 
 ##### METHODS #####
 
-func trigger():
-	_trigger()
-	emit_signal("condition_triggered", self)
-
-func expire():
-	_expire()
-	emit_signal("condition_expired", self)
+func _update_parent(p_enter):
+	var parent = get_parent()
+	if parent and !hidden:
+		if "conditions" in parent.get_property_list():
+			call("connect" if p_enter else "disconnect", "expired", parent, "on_condition_expired")
 
 ##### SETTERS AND GETTERS #####

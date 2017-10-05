@@ -14,11 +14,11 @@ var filters = []		# The child Filters owned by this Filter, optional. Will autom
 # Add self to parent's Filter cache, if needed
 # Fetch owner, if it exists
 func _enter_tree():
-	_add_to_parent_cache()
+	_update_parent(true)
 
 # Remove self from parent's Skill cache, if needed
 func _exit_tree():
-	_remove_from_parent_cache()
+	_update_parent(false)
 
 # Applies some change to the node, ideally only if it meets certain criteria
 # @param p_node Node The node that will be examined and possibly modified
@@ -37,16 +37,12 @@ func filter(p_node):
 		filter._filter(node)
 	return node
 
-# Utility for adding this Skill to a parent Skill's cache of child Skills
-func _add_to_parent_cache():
+func _update_parent(p_enter):
 	var parent = get_parent()
 	if parent and ("skills" in parent.get_property_list()):
-		parent.skills.append(self)
-
-# Utility for removing this Skill from a parent Skill's cache of child Skills
-func _remove_from_parent_cache():
-	var parent = get_parent()
-	if parent and ("skills" in parent.get_property_list()):
-		parent.skills.erase(self)
+		if p_enter:
+			parent.skills.append(self)
+		else:
+			parent.skills.erase(self)
 
 ##### SETTERS AND GETTERS #####

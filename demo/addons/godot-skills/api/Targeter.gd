@@ -28,10 +28,12 @@ var _targets = []           # For optional caching of PROACTIVE targeting
 # Updates parent Targeter cache
 func _enter_tree():
 	get_parent().targeters.append(self)
+	connect("target_found", Skills.fetch_skill(self), "on_target_found")
 
 # Updates parent Targeter cache
 func _exit_tree():
 	get_parent().targeters.erase(self)
+	disconnect("target_found", Skills.fetch_skill(self), "on_target_found")
 
 # Custom Notification
 # null base implementation, to be overridden

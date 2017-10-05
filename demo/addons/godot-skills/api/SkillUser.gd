@@ -8,8 +8,6 @@ extends Node
 ##### SIGNALS #####
 signal condition_added(p_skill_user, p_condition)
 signal condition_removed(p_skill_user, p_condition)
-signal condition_triggered(p_skill_user, p_condition)
-signal condition_expired(p_skill_user, p_condition)
 
 signal skill_used(p_skill_user, p_skill, p_params)
 signal skill_tested(p_skill_user, p_skill, p_props)
@@ -20,6 +18,8 @@ const Skills = preload("GodotSkillsUtility.gd")
 ##### EXPORTS #####
 
 ##### MEMBERS #####
+var skills = []
+var conditions = []
 
 ##### NOTIFICATIONS #####
 
@@ -43,13 +43,17 @@ func _filter_skill_output(p_source, p_skill):
 
 # @param The node of the skill to use. Typically use($skill_name)
 func use(p_skill, p_params):
+	if not p_skill.enabled: return false
 	var skill = _filter_skill_output(self, p_skill)
 	skill.activate(self, p_params)
 
-func accept(p_skill, p_params):
-	var owner = Skills.fetch_skill_user(p_skill)
-	var skill = _filter_skill_input(owner, p_skill)
-	skill._skill_apply(owner, self, self, p_params)
+func accept(p_user, p_skill, p_params):
+	var skill = _filter_skill_input(p_user, p_skill)
+	skill.apply(p_user, self, p_params)
+
+func test(p_skill, p_params, p_props):
+	var skill = _filter_skill_output(self, p_skill)
+	return skill.test_properties(self, p_params, p_props)
 
 func add_condition(p_condition):
 	add_child(p_condition)

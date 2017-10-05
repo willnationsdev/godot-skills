@@ -38,13 +38,13 @@ func _enter_tree():
 func _exit_tree():
 	_remove_from_parent_cache()
 
-# Triggers the use of this skill. Should eventually call "apply"
+# Triggers the use of this skill. Should eventually call "accept" on each target SkillUser
 # - Custom Notification
 # - base implemention, applies all effects to all targets immediately
 #   without visualization
 func _activate(p_user, p_params):
-	var targets = _skill_get_targets()
-	_skill_apply(targets, p_params)
+	for target in _skill_get_targets():
+		target.accept(p_user, self, p_params)
 
 func _deactivate(p_user, p_params):
 	pass
@@ -56,17 +56,14 @@ func activate(p_user, p_params):
 	if not enabled: return
 	for skill in skills:
 		skill.activate(p_user, p_params)
-	_skilll_update_targeter_connections(get_children(), true)
 	_activate(p_user, p_params)
 	_is_active = true
 	emit_signal("skill_activated", self, p_user, p_params)
 
 # Deactivates all children, deactivates self, then signals deactivation
 func deactivate(p_user, p_params):
-	if not enabled: return
 	for skill in skills:
 		skill.deactivate(p_user, p_params)
-	_skill_update_targeter_connections(get_children(), false)
 	_deactivate(p_user, p_params)
 	_is_active = false
 	emit_signal("skill_deactivated", self, p_user, p_params)
@@ -78,13 +75,13 @@ func deactivate(p_user, p_params):
 # @param p_user        The SkillUser responsible for using this Skill.
 # @param p_params      The Dictionary of parameters associated with the Skill-use.
 # @param void
-func apply(p_user, p_params):
-	if not enabled: return
-	var targets = _skill_get_targets()
-	_skill_apply(targets, p_params)
+func apply(p_user, p_target, p_params):
+	for effect in effects:
+		effect.apply(p_user, p_target, p_target, p_params)
+	emit_signal("skill_applied", self, p_user, p_target)
 
 func on_target_found(p_targeter, p_target):
-	_skill_apply([p_target], {"targeter":p_targeter})
+	apply(Skills.fetch_skill_user(self), p_target, {"targeter":p_targeter})
 
 # test_properties()
 # 
@@ -99,8 +96,29 @@ func on_target_found(p_targeter, p_target):
 #     "root/path/to/node2"  : { etc. },
 # }
 func test_properties(p_user, p_params, p_props):
-	var targets = _skill_get_targets(p_params)
-	return _skill_apply_test(targets, p_params, p_props)
+	# Initialize the result set.
+	var result = {}
+
+	# For each target, get a copy of the requested properties
+	for target in _skill_get_targets(p_params):
+		var prop_copies = {}
+		for prop in p_props:
+			prop_copies[prop] = target.get(prop)
+		
+		# Apply the effects, but supply the copied properties as the target's "write" variables
+		for effect in effects:
+			effect.apply(p_user, target, prop_copies, p_params)
+		
+		# Store the properties by path, name, or reference (in that order of priority)
+		if target.is_inside_tree():
+			result[target.get_path()] = prop_copies
+		elif !result.has(target.get_name()):
+			result[target.get_name()] = prop_copies
+		else:
+			result[target] = prop_copies
+	
+	# Return the set of all targets' requested properties
+	return result
 
 func enable(): set_enabled(true)       # for convenience
 func disable(): set_enabled(false)     # for convenience
@@ -114,38 +132,6 @@ func _skill_get_targets(p_params):
 			targets[target] = null
 	return targets.keys()
 
-# Utility for applying the skill's effects using child Effects
-func _skill_apply(p_targets, p_params):
-	for target in p_targets:
-		var filtered_skill = target.accept(self, p_params)
-		for effect in effects:
-			effect.apply(p_user, target, target, p_params)
-			emit_signal("skill_applied", self, p_user, p_target)
-
-func _skill_apply_test(p_targets, p_params, p_props):
-	# Initialize the result set.
-	var result = {}
-
-	# For each target, get a copy of the requested properties
-	for target in targets:
-		var prop_copies = {}
-		for prop in p_props:
-			prop_copies[prop] = target.get(prop)
-		
-		# Apply the effects, but supply the copied properties as the target's "write" variables
-		for effect in effects:
-			effect.apply(p_user, target, prop_copies, p_params)
-		
-		# If the target has a path in the tree, set that as its key in the result set
-		# Else, use its name as the key
-		if target.is_inside_tree():
-			result[target.get_path()] = prop_copies
-		else:
-			result[target.get_name()] = prop_copies
-	
-	# Return the set of all targets' requested properties
-	return result
-
 # Utility for adding this Skill to a parent's Skill cache
 func _skill_add_to_parent_cache():
 	var parent = get_parent()
@@ -157,13 +143,6 @@ func _skill_remove_from_parent_cache():
 	var parent = get_parent()
 	if parent and ("skills" in parent.get_property_list()):
 		parent.skills.erase(self)
-
-func _skill_update_targeter_connections(p_targeters, p_connect = true):
-	for targeter in p_targeters:
-		if (not targeter) or (not targeter.has_signal("target_found")): return
-		targeter.call("connect" if p_connect else "disconnect", "target_found", self, "on_target_found")
-		if "targeters" in targeter.get_property_list():
-			_skill_update_targeter_connections(targeter.targeters, p_connect)
 
 ##### SETTERS AND GETTERS #####
 func set_skill_name(p_skill_name): skill_name = p_skill_name
