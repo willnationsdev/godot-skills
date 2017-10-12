@@ -13,23 +13,32 @@ script = ExtResource( 1 )
 __meta__ = {
 "_editor_icon": ExtResource( 2 )
 }
+is_signal_target = true
 skill_name = "print_target_name"
 enabled = true
 auto_deactivate_on_disable = true
 
-[node name="node_path" type="Node" parent="."]
+[node name="targeters" type="Node" parent="."]
+
+[node name="node_path" type="Node" parent="targeters"]
 
 script = ExtResource( 3 )
 __meta__ = {
 "_editor_icon": ExtResource( 4 )
 }
+is_signal_target = false
+uses_targeting_system = false
+is_static = true
 node_path = null
 
-[node name="print_name" type="Node" parent="."]
+[node name="effects" type="Node" parent="."]
+
+[node name="print_name" type="Node" parent="effects"]
 
 script = ExtResource( 5 )
 __meta__ = {
 "_editor_icon": ExtResource( 6 )
 }
+is_signal_target = false
 
 

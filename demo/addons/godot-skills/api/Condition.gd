@@ -1,31 +1,43 @@
-extends Node
+extends "SignalUpdater.gd"
 
 ##### SIGNALS #####
-signal triggered(p_condition, p_skill) # Emitted just after the skill has been executed
-signal expired(p_condition)
+signal condition_triggered(p_condition) # Emitted just after the skill has been executed
+signal condition_expired(p_condition)
 
 ##### CONSTANTS #####
 
 ##### EXPORTS #####
-export(NodePath) var skill = null		#For design-time creation of conditions
-export(bool) var hidden = false			#if hidden, not added to SkillUser cache
+export(NodePath) var on_add_skill = null		#The Skill activated upon addition to a SkillUser
+export(NodePath) var on_remove_skill = null		#The Skill activated upon removal from a SkillUser
+export(NodePath) var on_trigger_skill = null	#The Skill activated upon triggering
+export(bool) var hidden = false					#if hidden, not added to SkillUser cache
 
 ##### MEMBERS #####
+var creator = null # The source SkillUser for this Condition
 
 ##### NOTIFICATIONS #####
 
+func _init():
+	is_signal_target = false
+	signals_to_update = get_signal_list()
+
 func _enter_tree():
-	_update_parent(true)
+	if on_add_skill:
+		get_node(on_add_skill).activate(creator, {"condition": self})
+	if get_parent().has_user_signal("condition_added"):
+		get_parent().emit_signal("condition_added", get_parent(), self)
 
 func _exit_tree():
-	_update_parent(false)
+	if on_remove_skill:
+		get_node(on_remove_skill).activate(creator, {"condition": self})
+	if get_parent().has_user_signal("condition_removed"):
+		get_parent().emit_signal("condition_removed", get_parent(), self)
 
 ##### METHODS #####
 
-func _update_parent(p_enter):
-	var parent = get_parent()
-	if parent and !hidden:
-		if "conditions" in parent.get_property_list():
-			call("connect" if p_enter else "disconnect", "expired", parent, "on_condition_expired")
+func trigger():
+	if on_trigger_skill:
+		get_node(on_trigger_skill).activate(creator, {"condition": self})
+	emit_signal("condition_triggered", self)
 
 ##### SETTERS AND GETTERS #####

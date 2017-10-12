@@ -13,6 +13,10 @@ config_version=3
 config/name="GodotSkillsDemo"
 config/icon="res://icon.png"
 
+[autoload]
+
+targeting_system="*res://addons/godot-skills/api/TargetingSystem.gd"
+
 [editor_plugins]
 
 enabled=PoolStringArray( "godot-skills" )
