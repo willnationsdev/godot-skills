@@ -9,54 +9,63 @@
 #                 to the node at the given NodePath and stored as a variable.
 #                 Signals for area_entered and body_entered are then relayed to
 #                 target_found connections for the Targeter
-extends Node
+extends "SignalUpdater.gd"
 
 ##### SIGNALS #####
 signal target_found(p_targeter, p_target) # For REACTIVE targeting
 
 ##### CONSTANTS #####
+const TargetingSystem = preload("TargetingSystem.gd")
 
 ##### EXPORTS #####
+export(bool) var uses_targeting_system = false
+export(bool) var is_static = true
 
 ##### MEMBERS #####
-var targeters = []          # Cached list of child Targeter nodes
-var _targets = []           # For optional caching of PROACTIVE targeting
 
 ##### NOTIFICATIONS #####
 
-# Updates parent Targeter cache
+func _init():
+	is_signal_target = false
+	signals_to_update = ["target_found"]
+
 func _enter_tree():
-	get_parent().targeters.append(self)
+	if uses_targeting_system:
+		get_tree().get_root().get_node(TargetingSystem.TSName).register_targeter(self)
 
-# Updates parent Targeter cache
 func _exit_tree():
-	get_parent().targeters.erase(self)
+	if uses_targeting_system:
+		get_tree().get_root().get_node(TargetingSystem.TSName).unregister_targeter(self)
 
-# Custom Notification
-# null base implementation, to be overridden
-# Acquires targets for this Targeter
+##### VIRTUALS #####
+
+# Acquires target SkillUser nodes for this Targeter
 func _get_targets(p_params):
-	pass
+	return []
+
+# If uses_targeting_system, will automatically acquire target SkillUsers for which this function returns true
+func _match_skill_user(p_skill_user):
+	return false
 
 ##### METHODS #####
 
 # Acquires the targets for this Targeter and its children
 func get_targets(p_params):
+	if uses_targeting_system:
+		return get_tree().get_root().get_node(TargetingSystem.TSName).fetch_targets(self)
+	
 	var r_targets = {} # Assures we'll have a unique list
 
-	for child in _child_targeters:
-		for target in child.get_targets():
-			r_targets[target] = null
+	for child in get_children():
+		if child is get_script():
+			for target in child.get_targets(p_params):
+				r_targets[target] = null
 
-	for target in _get_targets():
+	for target in _get_targets(p_params):
 		r_targets[target] = null
 
 	return r_targets.keys()
 
-func _fetch_skill_owner():
-	var parent = get_parent()
-	while parent and not parent is preload("Skill.gd"):
-		parent = parent.get_parent()
-	return parent
+func get_skill(): return signal_target
 
 ##### SETTERS AND GETTERS  #####
