@@ -5,6 +5,16 @@ const TSName = "targeting_system"
 
 var matchers = {}
 
+func _ready():
+	var config = ConfigFile.new()
+	if not config.load("res://godot-skills.cfg") == OK:
+		if not config.load("res://addons/godot-skills/godot-skills.cfg") == OK:
+			TSName = "targeting_system"
+		else:
+			TSName = config.get_value("targeting_system", "singleton_name", "targeting_system")
+	else:
+		TSName = config.get_value("targeting_system", "singleton_name", "targeting_system")
+
 func register_skill_user(p_skill_user):
 	for key in matchers:
 		var match_set = matchers[key]

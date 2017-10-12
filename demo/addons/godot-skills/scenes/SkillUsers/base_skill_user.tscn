@@ -12,8 +12,11 @@ __meta__ = {
 skills_path = NodePath("skills")
 filters_path = NodePath("filters")
 conditions_path = NodePath("conditions")
+duplicates_path = NodePath("duplicates")
 
 [node name="skills" type="Node" parent="."]
+
+[node name="duplicates" type="Node" parent="."]
 
 [node name="filters" type="Node" parent="."]
 

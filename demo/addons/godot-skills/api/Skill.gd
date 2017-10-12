@@ -39,7 +39,6 @@ func _init():
 	signals_to_update = get_signal_list()
 
 func _ready():
-	print('skill ready')
 	skills = get_node(skills_path)
 	effects = get_node(effects_path)
 	targeters = get_node(targeters_path)

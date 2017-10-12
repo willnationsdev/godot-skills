@@ -10,5 +10,8 @@ export(NodePath) var node_path = null
 #        r_targets.append(node)
 #    return r_targets
 
+func _init():
+	is_static = false
+
 func _match_skill_user(p_skill_user):
 	return get_node(node_path) == p_skill_user
