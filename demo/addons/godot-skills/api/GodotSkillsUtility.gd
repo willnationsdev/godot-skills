@@ -18,3 +18,16 @@ static func fetch_skill(p_node):
 	while ancestor and not ancestor is Skill:
 		ancestor = ancestor.get_parent()
 	return ancestor
+
+static func prop_get(p_obj, p_prop_name):
+	if typeof(p_obj) == TYPE_DICTIONARY:
+		return p_obj[p_prop_name]
+	elif typeof(p_obj) == TYPE_OBJECT:
+		return p_obj.get(p_prop_name)
+	return null
+
+static func prop_set(p_obj, p_prop_name, p_value):
+	if typeof(p_obj) == TYPE_DICTIONARY:
+		p_obj[p_prop_name] = p_value
+	elif typeof(p_obj) == TYPE_OBJECT:
+		p_obj.set(p_prop_name, p_value)
