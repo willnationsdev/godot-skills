@@ -1,5 +1,7 @@
 extends "SignalUpdater.gd"
 
+##### CLASSES #####
+
 ##### SIGNALS #####
 signal skill_filtered(p_filter, p_skill)
 
@@ -17,6 +19,8 @@ func _init():
 	is_signal_target = false
 	signals_to_update = ["skill_filtered"]
 
+##### OVERRIDES #####
+
 ##### VIRTUALS #####
 
 # Determines whether the given skill should be modified
@@ -26,16 +30,18 @@ func _init():
 func _filter(p_source, p_skill):
 	return true
 
-##### METHODS #####
+##### PUBLIC METHODS #####
 
 func filter(p_source, p_skill):
 	if _filter(p_source, p_skill):
 		for a_possible_effect in get_children():
 			if a_possible_effect.has_method("apply"):
-				a_possible_effect.apply(signal_target, p_skill, p_skill, {})
+				a_possible_effect.apply(signal_target, p_skill)
 	for a_possible_filter in get_children():
 		if a_possible_filter.has_method("filter"):
 			a_possible_filter.filter(p_source, p_skill)
+
+##### PRIVATE METHODS #####
 
 ##### SETTERS AND GETTERS #####
 func set_filter_set(p_filter_set): filter_set = p_filter_set

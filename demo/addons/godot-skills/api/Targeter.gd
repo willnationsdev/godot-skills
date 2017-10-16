@@ -20,7 +20,7 @@ const TargetingSystem = preload("TargetingSystem.gd")
 
 ##### EXPORTS #####
 export(bool) var uses_targeting_system = false
-export(bool) var is_static = true
+export(bool) var is_static = true setget set_static, is_static
 
 ##### MEMBERS #####
 
@@ -70,3 +70,5 @@ func get_targets(p_params):
 	return r_targets.keys()
 
 ##### SETTERS AND GETTERS  #####
+func set_static(p_static): is_static = p_static
+func get_static():         return is_static

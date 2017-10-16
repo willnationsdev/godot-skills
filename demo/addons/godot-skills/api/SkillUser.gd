@@ -14,10 +14,11 @@ signal skill_used(p_source, p_skill, p_params)
 signal skill_tested(p_source, p_skill, p_props)
 
 ##### CONSTANTS #####
-const Filter = preload("Filter.gd")
 const TargetingSystem = preload("TargetingSystem.gd")
 
 ##### EXPORTS #####
+export(NodePath) var owner_path = @"."
+export(NodePath) var stat_owner_path = @"."
 export(NodePath) var skills_path = @"skills"
 export(NodePath) var filters_path = @"filters"
 export(NodePath) var conditions_path = @"conditions"
@@ -28,10 +29,13 @@ var skills = null
 var filters = null
 var conditions = null
 var duplicates = null
+var stat_owner = null setget set_stat_owner, get_stat_owner
 
 ##### NOTIFICATIONS #####
 
 func _ready():
+	set_owner(get_node(owner_path))
+	stat_owner = get_node(stat_owner_path)
 	skills = get_node(skills_path)
 	filters = get_node(filters_path)
 	conditions = get_node(conditions_path)
@@ -45,7 +49,7 @@ func _die():
 
 # @param p_skill The node of the skill to use. Typically use($skills/skill_name)
 func use(p_skill, p_params = {}):
-	if not p_skill.enabled: return false
+	if not p_skill.is_enabled(): return false
 	var skill = _filter_skill_output(self, p_skill)
 	skill.activate(self, p_params)
 
@@ -57,6 +61,19 @@ func test(p_skill, p_props, p_params = {}):
 	var skill = _filter_skill_output(self, p_skill)
 	return skill.test_properties(self, p_props, p_params)
 
+func add_condition(p_condition):
+	conditions.add_child(p_condition)
+	p_condition.on_add()
+	emit_signal("condition_added", self, p_condition)
+
+func remove_condition(p_condition):
+	conditions.remove_child(p_condition)
+	p_condition.on_remove()
+	emit_signal("condition_removed", self, p_condition)
+
+func is_signal_target():
+	return true
+
 func on_condition_triggered(p_target, p_condition):
 	pass
 
@@ -64,6 +81,9 @@ func on_condition_expired(p_target, p_condition):
 	pass
 
 func on_skill_filtered(p_filter, p_skill):
+	pass
+
+func on_test_target_found(p_skill, p_source, p_target_report, p_params = {}):
 	pass
 
 func _filter_skill_input(p_source, p_skill):
@@ -82,6 +102,11 @@ func _utility_filter(p_source, p_skill, p_filter_set):
 			filter_node.filter(skill)
 	return skill
 
-func is_signal_target(): return true
+# Needed to ensure agnostic behavior with SkillUserReport for Effect.apply()
+# in Skill.activate() and Skill.test_properties()
+func get_skill_user():
+	return self
 
 ##### SETTERS AND GETTERS #####
+func set_stat_owner(p_stat_owner): stat_owner = p_stat_owner
+func get_stat_owner():             return stat_owner

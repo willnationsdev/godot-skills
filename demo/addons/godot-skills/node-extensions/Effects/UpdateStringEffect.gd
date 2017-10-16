@@ -1,4 +1,4 @@
-extends "UpdatePropertyEffect.gd"
+extends "BaseUpdatePropertyEffect.gd"
 
 export(String) var delta = ""
 

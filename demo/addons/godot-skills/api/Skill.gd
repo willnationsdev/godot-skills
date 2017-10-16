@@ -10,21 +10,25 @@
 
 extends "SignalUpdater.gd"
 
+##### CLASSES #####
+
 ##### SIGNALS #####
-signal skill_activated(p_skill, p_source, p_params)                 # Skill is turned on
-signal skill_deactivated(p_skill, p_source, p_params)               # Skill is turned off
-signal skill_applied(p_skill, p_source, p_params, p_target)         # Skill is directly affecting a target
+signal skill_activated(p_skill, p_source, p_params)                    # Skill is turned on
+signal skill_deactivated(p_skill, p_source, p_params)                  # Skill is turned off
+signal skill_applied(p_skill, p_source, p_target, p_params)            # Skill is directly affecting a target
+signal test_target_found(p_skill, p_source, p_target_report, p_params) # For test instances of Skills
 
 ##### CONSTANTS #####
 const Skills = preload("GodotSkillsUtility.gd")
+const SkillUserReport = preload("SkillUserReport.gd")
 
 ##### EXPORTS #####
-export var skill_name = "" setget set_skill_name, get_skill_name    # The name of the Skill, required
-export var enabled = true setget set_enabled, is_enabled            # If true, the skill will proactively apply to targets
-export var auto_deactivate_on_disable = true                        # If true, clearing 'enabled' will automatically call deactivate w/ p_params = {}
-export(NodePath) var skills_path = @"skills"                        # The path to the node which owns all of the Skill nodes for this Skill
-export(NodePath) var effects_path = @"effects"                      # The path to the node which owns all of the Effect nodes for this Skill
-export(NodePath) var targeters_path = @"targeters"                  # The path to the node which owns all of the Targeter nodes for this Skill
+export var skill_name = "" setget set_skill_name, get_skill_name       # The name of the Skill, required
+export var enabled = true setget set_enabled, is_enabled               # If true, the skill will proactively apply to targets
+export var auto_deactivate_on_disable = true                           # If true, clearing 'enabled' will automatically call deactivate w/ p_params = {}
+export(NodePath) var skills_path = @"skills"                           # The path to the node which owns all of the Skill nodes for this Skill
+export(NodePath) var effects_path = @"effects"                         # The path to the node which owns all of the Effect nodes for this Skill
+export(NodePath) var targeters_path = @"targeters"                     # The path to the node which owns all of the Targeter nodes for this Skill
 
 ##### MEMBERS #####
 var _is_active = false # Flag to prevent re-deactivation on disable if haven't activated
@@ -32,6 +36,7 @@ var tsid = randi() setget set_targeting_system_id, get_targeting_system_id # Tar
 var skills = null
 var effects = null
 var targeters = null
+var is_testing_instance = false
 
 ##### NOTIFICATIONS #####
 
@@ -43,6 +48,8 @@ func _ready():
 	skills = get_node(skills_path)
 	effects = get_node(effects_path)
 	targeters = get_node(targeters_path)
+
+##### OVERRIDES #####
 
 ##### VIRTUALS #####
 
@@ -60,13 +67,13 @@ func _deactivate(p_user, p_params = {}):
 ##### METHODS #####
 
 # Activates all children, activates self, then signals activation
-func activate(p_user, p_params = {}):
+func activate(p_source, p_params = {}):
 	if not enabled: return
 	for a_node in skills.get_children():
-		a_node.activate(p_user, p_params)
+		a_node.activate(p_source, p_params)
 	_activate(p_user, p_params)
 	_is_active = true
-	emit_signal("skill_activated", self, p_user, p_params)
+	emit_signal("skill_activated", self, p_source, p_params)
 
 # Deactivates all children, deactivates self, then signals deactivation
 func deactivate(p_user, p_params = {}):
@@ -80,22 +87,25 @@ func deactivate(p_user, p_params = {}):
 # 
 # Acquires all targets from all Targeters and then applies all Effects to each target.
 # 
-# @param p_user        The SkillUser responsible for using this Skill.
+# @param p_source      The SkillUser responsible for using this Skill.
 # @param p_params      The Dictionary of parameters associated with the Skill-use.
 # @param void
-func apply(p_user, p_target, p_params = {}):
+func apply(p_source, p_target, p_params = {}):
 	for effect_node in effects.get_children():
-		effect_node.apply(p_user, p_target, p_target, p_params)
-	emit_signal("skill_applied", self, p_user, p_target)
+		effect_node.apply(p_source, p_target, p_params)
+	emit_signal("skill_applied", self, p_source, p_target)
 
 func on_target_found(p_targeter, p_target):
-	apply(Skills.fetch_skill_user(self), p_target, {"targeter":p_targeter})
+	if _is_testing_instance:
+		emit_signal("test_target_found", self, signal_target, SkillUserReport.new(p_target), {})
+	else:
+		apply(signal_target, p_target, {"targeter":p_targeter})
 
 # test_properties()
 # 
 # Runs the Skill, makes copies of desired properties, and then reverts the Skill.
 # 
-# @param p_user        The SkillUser responsible for using this Skill.
+# @param p_source      The SkillUser responsible for using this Skill.
 # @param p_props       The StringArray of properties to get tested copies of.
 # @param p_params      The Dictionary of parameters associated with the Skill-use.
 # @return Dictionary   The Dictionary of tested properties as key-value pairs, structured as...
@@ -103,27 +113,34 @@ func on_target_found(p_targeter, p_target):
 #     "root/path/to/node"   : { "prop1" : value1, "prop2" : value2, etc. },
 #     "root/path/to/node2"  : { etc. },
 # }
-func test_properties(p_user, p_props, p_params = {}):
+func test_properties(p_source, p_props = [], p_params = {}):
 	# Initialize the result set.
 	var result = {}
+	var props = p_props
+	if props.empty():
+		props = {}
+		for effect_node in effect.get_children():
+			for a_param in effect_node.get_write_parameters():
+				props[a_param] = null
+		props = props.keys()
 
 	# For each target, get a copy of the requested properties
 	for target in _skill_get_targets(p_params):
-		var prop_copies = {}
-		for prop in p_props:
-			prop_copies[prop] = target.get(prop)
+		var report = SkillUserReport.new(target, p_props)
+		for a_prop in p_props:
+			report.set(target.get(a_prop))
 		
 		# Apply the effects, but supply the copied properties as the target's "write" variables
 		for effect_node in effects.get_children():
-			effect_node.apply(p_user, target, prop_copies, p_params)
+			effect_node.apply(p_source, report, p_params)
 		
 		# Store the properties by path, name, or reference (in that order of priority)
 		if target.is_inside_tree():
-			result[target.get_path()] = prop_copies
+			result[target.get_path()] = report
 		elif !result.has(target.get_name()):
-			result[target.get_name()] = prop_copies
+			result[target.get_name()] = report
 		else:
-			result[target] = prop_copies
+			result[target] = report
 	
 	# Return the set of all targets' requested properties
 	return result
@@ -137,7 +154,7 @@ func _skill_get_targets(p_params):
 	var static_targeters = {}
 	# Ensure that we don't end up with duplicate targets from multiple targeter sources
 	for targeter_node in get_node(targeters_path).get_children():
-		if targeter_node.is_static:
+		if targeter_node.is_static():
 			if static_targeters.has(targeter_node):
 				return []
 			else:
