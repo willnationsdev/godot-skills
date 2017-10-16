@@ -7,19 +7,22 @@ signal condition_expired(p_condition)
 ##### CONSTANTS #####
 
 ##### EXPORTS #####
-export(NodePath) var on_add_skill = null		#The Skill activated upon addition to a SkillUser
-export(NodePath) var on_remove_skill = null		#The Skill activated upon removal from a SkillUser
-export(NodePath) var on_trigger_skill = null	#The Skill activated upon triggering
-export(bool) var hidden = false					#if hidden, not added to SkillUser cache
+export(NodePath) var on_add_skill_path = null       #The Skill activated upon addition to a SkillUser
+export(NodePath) var on_remove_skill_path = null    #The Skill activated upon removal from a SkillUser
+export(NodePath) var on_trigger_skill_path = null   #The Skill activated upon triggering
+export(bool) var hidden = false                     #if hidden, not added to SkillUser cache
 
 ##### MEMBERS #####
+var on_add_skill = null
+var on_remove_skill_path = null
+var on_trigger_skill_path = null
 var creator = null # The source SkillUser for this Condition
 
 ##### NOTIFICATIONS #####
 
 func _init():
 	is_signal_target = false
-	signals_to_update = get_signal_list()
+	signals_to_update = ["condition_triggered", "condition_expired"]
 
 func _enter_tree():
 	if on_add_skill:

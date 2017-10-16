@@ -1,0 +1,9 @@
+OpenGL ES 3.0 Renderer: GeForce GTX 970M/PCIe/SSE2
+GLES3: max ubo light: 409
+GLES3: max ubo reflections: 455, ubo size: 144
+Registered interface Native mobile
+SkillUser is applying a print_name_effect on SkillUser with params: 
+**ERROR**: Condition ' _first != 0 ' is true.
+   At: d:\source\github\godot\core\self_list.h:99:SelfList<class GDFunction>::List::~List() - Condition ' _first != 0 ' is true.
+**ERROR**: Condition ' _first != 0 ' is true.
+   At: d:\source\github\godot\core\self_list.h:99:SelfList<class GDScript>::List::~List() - Condition ' _first != 0 ' is true.

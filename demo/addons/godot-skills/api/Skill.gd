@@ -7,6 +7,7 @@
 #     to its descendant Targeters dictates whether it automatically applies its Effects to the targets
 #     that the Targeter finds (at time of activation) or whether the Effects are applied to targets as
 #     the Targeter reports them via signal.
+
 extends "SignalUpdater.gd"
 
 ##### SIGNALS #####
@@ -26,8 +27,8 @@ export(NodePath) var effects_path = @"effects"                      # The path t
 export(NodePath) var targeters_path = @"targeters"                  # The path to the node which owns all of the Targeter nodes for this Skill
 
 ##### MEMBERS #####
-var _is_active = false              # Flag to prevent re-deactivation on disable if haven't activated
-var tsid = randi()  				# TargetingSystem ID: For helping descendant, non-static Targeters key into the same set of targets
+var _is_active = false # Flag to prevent re-deactivation on disable if haven't activated
+var tsid = randi() setget set_targeting_system_id, get_targeting_system_id # TargetingSystem ID: For helping descendant, non-static Targeters key into the same set of targets
 var skills = null
 var effects = null
 var targeters = null
@@ -36,7 +37,7 @@ var targeters = null
 
 func _init():
 	is_signal_target = true
-	signals_to_update = get_signal_list()
+	signals_to_update = ["skill_activated", "skill_deactivated", "skill_applied"]
 
 func _ready():
 	skills = get_node(skills_path)
@@ -49,11 +50,11 @@ func _ready():
 # - Custom Notification
 # - base implemention, applies all effects to all targets immediately
 #   without visualization
-func _activate(p_user, p_params):
+func _activate(p_user, p_params = {}):
 	for a_target in _skill_get_targets(p_params):
 		a_target.accept(p_user, self, p_params)
 
-func _deactivate(p_user, p_params):
+func _deactivate(p_user, p_params = {}):
 	pass
 
 ##### METHODS #####
@@ -61,14 +62,14 @@ func _deactivate(p_user, p_params):
 # Activates all children, activates self, then signals activation
 func activate(p_user, p_params = {}):
 	if not enabled: return
-	for a_node in get_node(skills_path).get_children():
+	for a_node in skills.get_children():
 		a_node.activate(p_user, p_params)
 	_activate(p_user, p_params)
 	_is_active = true
 	emit_signal("skill_activated", self, p_user, p_params)
 
 # Deactivates all children, deactivates self, then signals deactivation
-func deactivate(p_user, p_params):
+func deactivate(p_user, p_params = {}):
 	for a_node in skills.get_children():
 		a_node.deactivate(p_user, p_params)
 	_deactivate(p_user, p_params)
@@ -82,7 +83,7 @@ func deactivate(p_user, p_params):
 # @param p_user        The SkillUser responsible for using this Skill.
 # @param p_params      The Dictionary of parameters associated with the Skill-use.
 # @param void
-func apply(p_user, p_target, p_params):
+func apply(p_user, p_target, p_params = {}):
 	for effect_node in effects.get_children():
 		effect_node.apply(p_user, p_target, p_target, p_params)
 	emit_signal("skill_applied", self, p_user, p_target)
@@ -95,14 +96,14 @@ func on_target_found(p_targeter, p_target):
 # Runs the Skill, makes copies of desired properties, and then reverts the Skill.
 # 
 # @param p_user        The SkillUser responsible for using this Skill.
-# @param p_params      The Dictionary of parameters associated with the Skill-use.
 # @param p_props       The StringArray of properties to get tested copies of.
+# @param p_params      The Dictionary of parameters associated with the Skill-use.
 # @return Dictionary   The Dictionary of tested properties as key-value pairs, structured as...
 # {
 #     "root/path/to/node"   : { "prop1" : value1, "prop2" : value2, etc. },
 #     "root/path/to/node2"  : { etc. },
 # }
-func test_properties(p_user, p_params, p_props):
+func test_properties(p_user, p_props, p_params = {}):
 	# Initialize the result set.
 	var result = {}
 
@@ -146,11 +147,12 @@ func _skill_get_targets(p_params):
 	return targets.keys()
 
 ##### SETTERS AND GETTERS #####
-func set_skill_name(p_skill_name): skill_name = p_skill_name
-func get_skill_name():             return skill_name
-func is_enabled():                 return enabled
-
+func set_skill_name(p_skill_name):     skill_name = p_skill_name
+func get_skill_name():                 return skill_name
+func set_targeting_system_id(p_tsid):  tsid = p_tsid
+func get_targeting_system_id():        return tsid
 func set_enabled(p_enable):
 	enabled = p_enable
 	if auto_deactivate_on_disable and not p_enable and _is_active:
 		deactivate(Skills.fetch_skill_user(self), {})
+func is_enabled():                     return enabled

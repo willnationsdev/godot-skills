@@ -28,7 +28,6 @@ extends "SignalUpdater.gd"
 
 func _init():
 	is_signal_target = false
-	signals_to_update = get_signal_list()
 
 ##### VIRTUALS #####
 
@@ -50,9 +49,9 @@ func _get_write_parameters():
 
 # Applies all child effects on the target and then its own effect.
 func apply(p_source, p_target_read, p_target_write, p_params):
-	for a_effect in get_children():
-		if a_effect is get_script():
-			a_effect.apply(p_source, p_target_read, p_target_write, p_params)
+	for a_possible_effect in get_children():
+		if a_possible_effect.has_method("apply"):
+			a_possible_effect.apply(p_source, p_target_read, p_target_write, p_params)
 	_apply(p_source, p_target_read, p_target_write, p_params)
 
 ##### SETTERS AND GETTERS #####

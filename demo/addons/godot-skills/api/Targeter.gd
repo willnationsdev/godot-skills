@@ -9,6 +9,7 @@
 #                 to the node at the given NodePath and stored as a variable.
 #                 Signals for area_entered and body_entered are then relayed to
 #                 target_found connections for the Targeter
+
 extends "SignalUpdater.gd"
 
 ##### SIGNALS #####
@@ -51,21 +52,21 @@ func _match_skill_user(p_skill_user):
 
 # Acquires the targets for this Targeter and its children
 func get_targets(p_params):
-	if uses_targeting_system:
-		return get_tree().get_root().get_node(TargetingSystem.TSName).fetch_targets(self)
 	
 	var r_targets = {} # Assures we'll have a unique list
-
-	for child in get_children():
-		if child is get_script():
-			for target in child.get_targets(p_params):
+	
+	for a_possible_targeter in get_children():
+		if a_possible_targeter.has_method("get_targets"):
+			for target in a_possible_targeter.get_targets(p_params):
 				r_targets[target] = null
-
-	for target in _get_targets(p_params):
-		r_targets[target] = null
-
+	
+	if uses_targeting_system:
+		for target in get_tree().get_root().get_node(TargetingSystem.TSName).fetch_targets(self):
+			r_targets[target] = null
+	else:
+		for target in _get_targets(p_params):
+			r_targets[target] = null
+	
 	return r_targets.keys()
-
-func get_skill(): return signal_target
 
 ##### SETTERS AND GETTERS  #####

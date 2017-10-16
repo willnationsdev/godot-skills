@@ -3,15 +3,15 @@
 # - utilities for controlling Skill ownership and availability
 # - filtration of incoming and outgoing Skills
 # - managing skill conditions that are associated with the SkillUser
-tool
+
 extends Node
 
 ##### SIGNALS #####
-signal condition_added(p_skill_user, p_condition)
-signal condition_removed(p_skill_user, p_condition)
+signal condition_added(p_target, p_condition)
+signal condition_removed(p_target, p_condition)
 
-signal skill_used(p_skill_user, p_skill, p_params)
-signal skill_tested(p_skill_user, p_skill, p_props)
+signal skill_used(p_source, p_skill, p_params)
+signal skill_tested(p_source, p_skill, p_props)
 
 ##### CONSTANTS #####
 const Filter = preload("Filter.gd")
@@ -47,43 +47,38 @@ func _die():
 func use(p_skill, p_params = {}):
 	if not p_skill.enabled: return false
 	var skill = _filter_skill_output(self, p_skill)
-	get_node(duplicates_path).add_child(skill)
-	print(p_skill.get_node("targeters/node_path_targeter").is_static)
-	print(skill.get_node("targeters/node_path_targeter").is_static)
 	skill.activate(self, p_params)
-	get_node(duplicates_path).remove_child(skill)
 
 func accept(p_user, p_skill, p_params = {}):
 	var skill = _filter_skill_input(p_user, p_skill)
-	get_node(duplicates_path).add_child(skill)
 	skill.apply(p_user, self, p_params)
-	get_node(duplicates_path).remove_child(skill)
 
-func test(p_skill, p_params, p_props):
+func test(p_skill, p_props, p_params = {}):
 	var skill = _filter_skill_output(self, p_skill)
-	return skill.test_properties(self, p_params, p_props)
+	return skill.test_properties(self, p_props, p_params)
 
-func on_condition_triggered(p_skill_user, p_condition):
+func on_condition_triggered(p_target, p_condition):
 	pass
 
-func on_condition_expired(p_skill_user, p_condition):
+func on_condition_expired(p_target, p_condition):
 	pass
 
 func on_skill_filtered(p_filter, p_skill):
 	pass
 
-func _filter_skill_input(p_skill_user, p_skill):
-	return _utility_filter(p_skill_user, p_skill, Filter.FILTER_INPUT)
+func _filter_skill_input(p_source, p_skill):
+	return _utility_filter(p_source, p_skill, Filter.FILTER_INPUT)
 
-func _filter_skill_output(p_skill_user, p_skill):
-	return _utility_filter(p_skill_user, p_skill, Filter.FILTER_OUTPUT)
+func _filter_skill_output(p_source, p_skill):
+	return _utility_filter(p_source, p_skill, Filter.FILTER_OUTPUT)
 
 func _utility_filter(p_source, p_skill, p_filter_set):
+	if filters.get_children().empty(): return p_skill
 	var skill = p_skill.duplicate()
 	# update them to have matching TargetingSystem IDs
-	skill.tsid = p_skill.tsid
+	skill.set_targeting_system_id(p_skill.get_targeting_system_id())
 	for filter_node in filters.get_children():
-		if filter_node.filter_set == p_filter_set:
+		if filter_node.get_filter_set() == p_filter_set:
 			filter_node.filter(skill)
 	return skill
 
