@@ -14,10 +14,11 @@ signal skill_used(p_source, p_skill, p_params)
 signal skill_tested(p_source, p_skill, p_props)
 
 ##### CONSTANTS #####
+const Filter = preload("Filter.gd")
 const TargetingSystem = preload("TargetingSystem.gd")
 
 ##### EXPORTS #####
-export(NodePath) var owner_path = @"."
+export(NodePath) var actor_path = @"."
 export(NodePath) var stat_owner_path = @"."
 export(NodePath) var skills_path = @"skills"
 export(NodePath) var filters_path = @"filters"
@@ -30,11 +31,12 @@ var filters = null
 var conditions = null
 var duplicates = null
 var stat_owner = null setget set_stat_owner, get_stat_owner
+var actor = null setget set_actor, get_actor
 
 ##### NOTIFICATIONS #####
 
 func _ready():
-	set_owner(get_node(owner_path))
+	set_actor(get_node(actor_path))
 	stat_owner = get_node(stat_owner_path)
 	skills = get_node(skills_path)
 	filters = get_node(filters_path)
@@ -74,6 +76,15 @@ func remove_condition(p_condition):
 func is_signal_target():
 	return true
 
+func on_skill_applied(p_skill, p_source, p_target, p_params):
+	pass
+
+func on_skill_activated(p_skill, p_source, p_params):
+	pass
+
+func on_skill_deactivated(p_skill, p_source, p_params):
+	pass
+
 func on_condition_triggered(p_target, p_condition):
 	pass
 
@@ -110,3 +121,5 @@ func get_skill_user():
 ##### SETTERS AND GETTERS #####
 func set_stat_owner(p_stat_owner): stat_owner = p_stat_owner
 func get_stat_owner():             return stat_owner
+func set_actor(p_actor):           actor = p_actor
+func get_actor():                  return actor

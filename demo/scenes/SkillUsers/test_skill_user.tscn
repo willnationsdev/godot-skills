@@ -7,6 +7,8 @@
 [node name="SkillUser" instance=ExtResource( 1 )]
 
 script = ExtResource( 2 )
+actor_path = NodePath(".")
+stat_owner_path = NodePath(".")
 
 [node name="print_user_skill" parent="skills" instance=ExtResource( 3 )]
 

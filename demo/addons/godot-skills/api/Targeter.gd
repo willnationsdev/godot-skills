@@ -71,4 +71,4 @@ func get_targets(p_params):
 
 ##### SETTERS AND GETTERS  #####
 func set_static(p_static): is_static = p_static
-func get_static():         return is_static
+func is_static():          return is_static

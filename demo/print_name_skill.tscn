@@ -17,6 +17,9 @@ is_signal_target = true
 skill_name = "print_target_name"
 enabled = true
 auto_deactivate_on_disable = true
+skills_path = NodePath("skills")
+effects_path = NodePath("effects")
+targeters_path = NodePath("targeters")
 
 [node name="targeters" type="Node" parent="."]
 

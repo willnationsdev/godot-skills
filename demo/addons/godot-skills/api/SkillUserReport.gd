@@ -24,15 +24,15 @@ func _get(property):
 	return _data[property] if property in _report_properties else _skill_user.get(property)
 
 func _set(property, value):
-	data[property] = value
+	_data[property] = value
 
 ##### METHODS #####
 
 func get_stat_owner():
 	return self
 
-func get_owner():
-	return _skill_user.get_owner()
+func get_actor():
+	return _skill_user.get_actor()
 
 ##### SETTERS AND GETTERS #####
 func set_skill_user(p_skill_user): pass # do nothing

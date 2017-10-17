@@ -36,13 +36,13 @@ var tsid = randi() setget set_targeting_system_id, get_targeting_system_id # Tar
 var skills = null
 var effects = null
 var targeters = null
-var is_testing_instance = false
+var _is_testing_instance = false
 
 ##### NOTIFICATIONS #####
 
 func _init():
 	is_signal_target = true
-	signals_to_update = ["skill_activated", "skill_deactivated", "skill_applied"]
+	signals_to_update = ["skill_activated", "skill_deactivated", "skill_applied", "test_target_found"]
 
 func _ready():
 	skills = get_node(skills_path)
@@ -71,7 +71,7 @@ func activate(p_source, p_params = {}):
 	if not enabled: return
 	for a_node in skills.get_children():
 		a_node.activate(p_source, p_params)
-	_activate(p_user, p_params)
+	_activate(p_source, p_params)
 	_is_active = true
 	emit_signal("skill_activated", self, p_source, p_params)
 
@@ -93,7 +93,7 @@ func deactivate(p_user, p_params = {}):
 func apply(p_source, p_target, p_params = {}):
 	for effect_node in effects.get_children():
 		effect_node.apply(p_source, p_target, p_params)
-	emit_signal("skill_applied", self, p_source, p_target)
+	emit_signal("skill_applied", self, p_source, p_target, p_params)
 
 func on_target_found(p_targeter, p_target):
 	if _is_testing_instance:
@@ -119,7 +119,7 @@ func test_properties(p_source, p_props = [], p_params = {}):
 	var props = p_props
 	if props.empty():
 		props = {}
-		for effect_node in effect.get_children():
+		for effect_node in effects.get_children():
 			for a_param in effect_node.get_write_parameters():
 				props[a_param] = null
 		props = props.keys()
