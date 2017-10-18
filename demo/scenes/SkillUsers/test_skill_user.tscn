@@ -14,10 +14,10 @@ stat_owner_path = NodePath(".")
 
 skill_name = "print_name"
 
-[node name="node_path_targeter" parent="skills/print_user_skill/targeters"]
+[node name="npt2" parent="skills/print_user_skill/targeters"]
 
 is_static = false
-node_path = NodePath("../../../..")
+node_path = NodePath("Null")
 
 
 [editable path="skills/print_user_skill"]

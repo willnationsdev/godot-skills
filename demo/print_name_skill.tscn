@@ -2,10 +2,10 @@
 
 [ext_resource path="res://print_name_skill.gd" type="Script" id=1]
 [ext_resource path="res://addons/godot-skills/api/icons/icon_skill.png" type="Texture" id=2]
-[ext_resource path="res://addons/godot-skills/node-extensions/Targeters/node_path_targeter.gd" type="Script" id=3]
-[ext_resource path="res://addons/godot-skills/api/icons/icon_targeter.png" type="Texture" id=4]
-[ext_resource path="res://addons/godot-skills/node-extensions/Effects/print_name_effect.gd" type="Script" id=5]
-[ext_resource path="res://addons/godot-skills/api/icons/icon_effect.png" type="Texture" id=6]
+[ext_resource path="res://addons/godot-skills/node-extensions/Effects/print_name_effect.gd" type="Script" id=3]
+[ext_resource path="res://addons/godot-skills/api/icons/icon_effect.png" type="Texture" id=4]
+[ext_resource path="res://addons/godot-skills/node-extensions/Targeters/node_path_targeter.gd" type="Script" id=5]
+[ext_resource path="res://addons/godot-skills/api/icons/icon_targeter.png" type="Texture" id=6]
 
 [node name="Skill" type="Node"]
 
@@ -21,27 +21,29 @@ skills_path = NodePath("skills")
 effects_path = NodePath("effects")
 targeters_path = NodePath("targeters")
 
-[node name="targeters" type="Node" parent="."]
+[node name="skills" type="Node" parent="."]
 
-[node name="node_path" type="Node" parent="targeters"]
+[node name="effects" type="Node" parent="."]
+
+[node name="print_name" type="Node" parent="effects"]
 
 script = ExtResource( 3 )
 __meta__ = {
 "_editor_icon": ExtResource( 4 )
 }
 is_signal_target = false
-uses_targeting_system = false
-is_static = true
-node_path = null
 
-[node name="effects" type="Node" parent="."]
+[node name="targeters" type="Node" parent="."]
 
-[node name="print_name" type="Node" parent="effects"]
+[node name="node_path" type="Node" parent="targeters"]
 
 script = ExtResource( 5 )
 __meta__ = {
 "_editor_icon": ExtResource( 6 )
 }
 is_signal_target = false
+uses_targeting_system = false
+is_static = true
+node_path = null
 
 

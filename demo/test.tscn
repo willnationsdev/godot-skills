@@ -1,17 +1,28 @@
 [gd_scene load_steps=2 format=2]
 
-[sub_resource type="GDScript" id=1]
+[ext_resource path="res://scenes/SkillUsers/test_skill_user.tscn" type="PackedScene" id=1]
 
-script/source = "extends Node
+[node name="world" type="Node2D"]
 
-const SkillUserReport = preload(\"res://addons/godot-skills/api/SkillUserReport.gd\")
+[node name="SkillUser" parent="." instance=ExtResource( 1 )]
 
-func _ready():
-	var obj = SkillUserReport.new()
-	"
+[node name="npt1" parent="SkillUser/skills/print_user_skill/targeters"]
 
-[node name="Node" type="Node"]
+is_static = false
+node_path = NodePath("../../../..")
 
-script = SubResource( 1 )
+[node name="npt2" parent="SkillUser/skills/print_user_skill/targeters"]
+
+node_path = NodePath("../../../../../SkillUser2")
+
+[node name="SkillUser2" parent="." instance=ExtResource( 1 )]
+
+[node name="npt1" parent="SkillUser2/skills/print_user_skill/targeters"]
+
+is_static = false
 
 
+[editable path="SkillUser"]
+[editable path="SkillUser/skills/print_user_skill"]
+[editable path="SkillUser2"]
+[editable path="SkillUser2/skills/print_user_skill"]

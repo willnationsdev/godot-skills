@@ -54,7 +54,7 @@ static func search_res(p_regex):
 					dirs.push_back(dir.get_current_dir() + "/" + file_name)
 				# If a file, see if matches our regex. If so, map the skill name to the scene path
 				else:
-					var regexMatch = regex.search(file_name)
+					var regexMatch = p_regex.search(file_name)
 					if regexMatch != null:
 						print("found file named: ", file_name)
 						var skill_name = regexMatch.get_string("title")

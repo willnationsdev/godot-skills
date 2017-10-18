@@ -16,7 +16,18 @@ __meta__ = {
 }
 is_signal_target = false
 
-[node name="node_path_targeter" type="Node" parent="targeters"]
+[node name="npt1" type="Node" parent="targeters"]
+
+script = ExtResource( 4 )
+__meta__ = {
+"_editor_icon": ExtResource( 5 )
+}
+is_signal_target = false
+uses_targeting_system = true
+is_static = true
+node_path = null
+
+[node name="npt2" type="Node" parent="targeters"]
 
 script = ExtResource( 4 )
 __meta__ = {

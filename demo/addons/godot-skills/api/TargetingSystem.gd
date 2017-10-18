@@ -30,6 +30,7 @@ func _ready():
 		TSName = config.get_value("targeting_system", "singleton_name", "targeting_system")
 
 func register_skill_user(p_skill_user):
+	print("registering: ", p_skill_user)
 	for key in matchers:
 		var match_set = matchers[key]
 		if match_set.match_func.call_func(p_skill_user):
