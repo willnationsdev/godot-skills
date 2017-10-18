@@ -11,10 +11,20 @@ func _get_targets(p_params):
     return r_targets
 
 func _init():
-	is_static = false
+	node_path = null
 
 func _match_skill_user(p_skill_user):
-	if not node_path or node_path.is_empty(): return false
-	var result = get_node(node_path) == p_skill_user
-	print("matching: ", p_skill_user, " > targeter: ", get_path(), " > nodepath: ", node_path, " > result: ", result)
+	print("in targeter: ", get_path(), " > nodepath: ", node_path)
+	var empty = null
+	if node_path:
+		empty = node_path.is_empty()
+		if empty:
+			return false
+		else:
+			print(node_path)
+	else:
+		return false
+	var node = get_node(node_path)
+	var result = node == p_skill_user
+	print("result: ", result)
 	return result

@@ -20,7 +20,7 @@ const TargetingSystem = preload("TargetingSystem.gd")
 
 ##### EXPORTS #####
 export(bool) var uses_targeting_system = false
-export(bool) var is_static = true setget set_static, is_static
+export(bool) var is_static = false setget set_static, is_static
 
 ##### MEMBERS #####
 

@@ -24,7 +24,7 @@ __meta__ = {
 }
 is_signal_target = false
 uses_targeting_system = true
-is_static = true
+is_static = false
 node_path = null
 
 [node name="npt2" type="Node" parent="targeters"]
@@ -35,7 +35,7 @@ __meta__ = {
 }
 is_signal_target = false
 uses_targeting_system = true
-is_static = true
+is_static = false
 node_path = null
 
 
