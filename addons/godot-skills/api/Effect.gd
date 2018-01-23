@@ -14,7 +14,7 @@
 # AddConditionEffect:     Creates a Condition and adds it to the target SkillUser's list of Conditions
 # TriggerConditionEffect: Triggers the activation of a Condition attached to the target SkillUser.
 # RemoveConditionEffect:  Given a Condition, a number of instances (-1 for all) of that Condition are removed from the target SkillUser's list of Conditions.
-extends "SignalUpdater.gd"
+extends Node
 
 ##### CLASSES #####
 
@@ -26,10 +26,9 @@ extends "SignalUpdater.gd"
 
 ##### MEMBERS #####
 
-##### NOTIFICATIONS #####
+var _effects = [] setget , get_effects
 
-func _init():
-	is_signal_target = false
+##### NOTIFICATIONS #####
 
 ##### OVERRIDES #####
 
@@ -42,12 +41,6 @@ func _init():
 func _apply(p_source, p_target_report, p_params):
 	pass
 
-# Notifies others of which properties will be overwritten for testing purposes
-# Note that this is unnecessary for Skills attached to Filters since they will not do any testing at all.
-# @return PoolStringArray The names of the properties on the target that will be written to
-func _get_write_parameters():
-	return []
-
 ##### PUBLIC METHODS #####
 
 # Applies all child effects on the target and then its own effect.
@@ -57,16 +50,9 @@ func apply(p_source, p_target, p_params):
 			a_possible_effect.apply(p_source, p_target, p_params)
 	_apply(p_source, p_target, p_params)
 
-func get_write_parameters():
-	var write_params = {}
-	for a_param in _get_write_parameters():
-		write_params[a_param] = null
-	for a_possible_effect in get_children():
-		if a_possible_effect.has_method("get_write_parameters"):
-			for a_param in a_possible_effect.get_write_parameters():
-				write_params[a_param] = null
-	return write_params.keys()
-
 ##### PRIVATE METHODS #####
 
 ##### SETTERS AND GETTERS #####
+
+func get_effects():
+	return _effects

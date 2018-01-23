@@ -24,6 +24,8 @@ export(bool) var is_static = false setget set_static, is_static
 
 ##### MEMBERS #####
 
+var _targeters = [] setget , get_targeters
+
 ##### NOTIFICATIONS #####
 
 func _init():
@@ -33,10 +35,14 @@ func _init():
 func _enter_tree():
 	if uses_targeting_system:
 		get_tree().get_root().get_node(TargetingSystem.TSName).register_targeter(self)
+	if get_parent().has_method("get_targeters"):
+		get_parent().get_targeters().append(self)
 
 func _exit_tree():
 	if uses_targeting_system:
 		get_tree().get_root().get_node(TargetingSystem.TSName).unregister_targeter(self)
+	if get_parent().has_method("get_targeters"):
+		get_parent().get_targeters().erase(self)
 
 ##### VIRTUALS #####
 
@@ -55,9 +61,9 @@ func get_targets(p_params):
 	
 	var r_targets = {} # Assures we'll have a unique list
 	
-	for a_possible_targeter in get_children():
+	for a_targeter in _targeters:
 		if a_possible_targeter.has_method("get_targets"):
-			for target in a_possible_targeter.get_targets(p_params):
+			for target in a_targeter.get_targets(p_params):
 				r_targets[target] = null
 	
 	if uses_targeting_system:
@@ -70,5 +76,12 @@ func get_targets(p_params):
 	return r_targets.keys()
 
 ##### SETTERS AND GETTERS  #####
-func set_static(p_static): is_static = p_static
-func is_static():          return is_static
+
+func set_static(p_static):
+	is_static = p_static
+
+func is_static():
+	return is_static
+
+func get_targeters():
+	return _targeters

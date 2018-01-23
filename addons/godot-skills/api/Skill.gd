@@ -117,12 +117,12 @@ func test_properties(p_source, p_props = [], p_params = {}):
 	# Initialize the result set.
 	var result = {}
 	var props = p_props
-	if props.empty():
-		props = {}
-		for effect_node in effects.get_children():
-			for a_param in effect_node.get_write_parameters():
-				props[a_param] = null
-		props = props.keys()
+#	if props.empty():
+#		props = {}
+#		for effect_node in effects.get_children():
+#			for a_param in effect_node.get_write_parameters():
+#				props[a_param] = null
+#		props = props.keys()
 
 	# For each target, get a copy of the requested properties
 	for target in _skill_get_targets(p_params):
