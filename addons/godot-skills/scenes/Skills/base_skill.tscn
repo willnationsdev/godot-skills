@@ -3,7 +3,7 @@
 [ext_resource path="res://addons/godot-skills/api/Skill.gd" type="Script" id=1]
 [ext_resource path="res://addons/godot-skills/api/icons/icon_skill.png" type="Texture" id=2]
 
-[node name="Skill" type="Node"]
+[node name="Skill" type="Node" index="0"]
 
 script = ExtResource( 1 )
 __meta__ = {
@@ -17,10 +17,10 @@ skills_path = NodePath("skills")
 effects_path = NodePath("effects")
 targeters_path = NodePath("targeters")
 
-[node name="skills" type="Node" parent="."]
+[node name="skills" type="Node" parent="." index="0"]
 
-[node name="effects" type="Node" parent="."]
+[node name="effects" type="Node" parent="." index="1"]
 
-[node name="targeters" type="Node" parent="."]
+[node name="targeters" type="Node" parent="." index="2"]
 
 

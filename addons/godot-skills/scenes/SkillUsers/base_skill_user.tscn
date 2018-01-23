@@ -3,23 +3,25 @@
 [ext_resource path="res://addons/godot-skills/api/SkillUser.gd" type="Script" id=1]
 [ext_resource path="res://addons/godot-skills/api/icons/icon_skill_user.png" type="Texture" id=2]
 
-[node name="SkillUser" type="Node"]
+[node name="SkillUser" type="Node" index="0"]
 
 script = ExtResource( 1 )
 __meta__ = {
 "_editor_icon": ExtResource( 2 )
 }
+actor_path = NodePath(".")
+stat_owner_path = NodePath(".")
 skills_path = NodePath("skills")
 filters_path = NodePath("filters")
 conditions_path = NodePath("conditions")
 duplicates_path = NodePath("duplicates")
 
-[node name="skills" type="Node" parent="."]
+[node name="skills" type="Node" parent="." index="0"]
 
-[node name="duplicates" type="Node" parent="."]
+[node name="duplicates" type="Node" parent="." index="1"]
 
-[node name="filters" type="Node" parent="."]
+[node name="filters" type="Node" parent="." index="2"]
 
-[node name="conditions" type="Node" parent="."]
+[node name="conditions" type="Node" parent="." index="3"]
 
 
