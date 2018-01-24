@@ -1,4 +1,4 @@
-extends "SignalUpdater.gd"
+extends "signal_updater.gd"
 
 ##### SIGNALS #####
 signal condition_triggered(p_condition) # Emitted just after the skill has been executed

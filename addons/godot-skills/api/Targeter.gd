@@ -10,7 +10,9 @@
 #                 Signals for area_entered and body_entered are then relayed to
 #                 target_found connections for the Targeter
 
-extends "SignalUpdater.gd"
+extends "signal_updater.gd"
+
+##### CLASSES #####
 
 ##### SIGNALS #####
 signal target_found(p_targeter, p_target) # For REACTIVE targeting
@@ -24,6 +26,11 @@ export(bool) var is_static = false setget set_static, is_static
 
 ##### MEMBERS #####
 
+# public
+
+# public onready
+
+# private
 var _targeters = [] setget , get_targeters
 
 ##### NOTIFICATIONS #####
@@ -34,15 +41,17 @@ func _init():
 
 func _enter_tree():
 	if uses_targeting_system:
-		get_tree().get_root().get_node(TargetingSystem.TSName).register_targeter(self)
+		get_node("/root/"+TargetingSystem.TSName).register_targeter(self)
 	if get_parent().has_method("get_targeters"):
 		get_parent().get_targeters().append(self)
 
 func _exit_tree():
 	if uses_targeting_system:
-		get_tree().get_root().get_node(TargetingSystem.TSName).unregister_targeter(self)
+		get_node("/root/"+TargetingSystem.TSName).unregister_targeter(self)
 	if get_parent().has_method("get_targeters"):
 		get_parent().get_targeters().erase(self)
+
+##### OVERRIDES #####
 
 ##### VIRTUALS #####
 
@@ -54,7 +63,7 @@ func _get_targets(p_params):
 func _match_skill_user(p_skill_user):
 	return false
 
-##### METHODS #####
+##### PUBLIC METHODS #####
 
 # Acquires the targets for this Targeter and its children
 func get_targets(p_params):
@@ -74,6 +83,10 @@ func get_targets(p_params):
 			r_targets[target] = null
 	
 	return r_targets.keys()
+
+##### PRIVATE METHODS #####
+
+##### CONNECTIONS #####
 
 ##### SETTERS AND GETTERS  #####
 

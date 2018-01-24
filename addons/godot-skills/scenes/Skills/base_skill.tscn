@@ -9,13 +9,12 @@ script = ExtResource( 1 )
 __meta__ = {
 "_editor_icon": ExtResource( 2 )
 }
-is_signal_target = true
+connect_to = ""
+signals = null
+methods = null
 skill_name = ""
 enabled = true
 auto_deactivate_on_disable = true
-skills_path = NodePath("skills")
-effects_path = NodePath("effects")
-targeters_path = NodePath("targeters")
 
 [node name="skills" type="Node" parent="." index="0"]
 

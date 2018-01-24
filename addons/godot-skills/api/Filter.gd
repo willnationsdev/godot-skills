@@ -1,4 +1,4 @@
-extends "SignalUpdater.gd"
+extends "signal_updater.gd"
 
 ##### CLASSES #####
 

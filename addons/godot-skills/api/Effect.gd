@@ -14,7 +14,7 @@
 # AddConditionEffect:     Creates a Condition and adds it to the target SkillUser's list of Conditions
 # TriggerConditionEffect: Triggers the activation of a Condition attached to the target SkillUser.
 # RemoveConditionEffect:  Given a Condition, a number of instances (-1 for all) of that Condition are removed from the target SkillUser's list of Conditions.
-extends Node
+extends "signal_updater.gd"
 
 ##### CLASSES #####
 
@@ -26,9 +26,22 @@ extends Node
 
 ##### MEMBERS #####
 
+# public
+
+# public onready
+
+# private
 var _effects = [] setget , get_effects
 
 ##### NOTIFICATIONS #####
+
+func _enter_tree():
+	if get_parent().has_method("get_effects"):
+		get_parent().get_effects().append(self)
+
+func _exit_tree():
+	if get_parent().has_method("get_effects"):
+		get_parent().get_effects().erase(self)
 
 ##### OVERRIDES #####
 
