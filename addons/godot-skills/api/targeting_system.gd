@@ -10,7 +10,7 @@ extends Node
 ##### SIGNALS #####
 
 ##### CONSTANTS #####
-const Skills = preload("GodotSkillsUtility.gd")
+const Util = preload("godot_skills_utility.gd")
 const TSName = "targeting_system"
 
 ##### EXPORTS #####
@@ -77,7 +77,7 @@ func _get_targeter_key(p_targeter):
 	if p_targeter.is_static:
 		return p_targeter.get_script().get_path()
 	else:
-		var skill = Skills.fetch_skill(p_targeter)
+		var skill = Util.fetch_skill(p_targeter)
 		return str(skill.get_targeting_system_id()) + str(skill.get_path_to(p_targeter))
 
 ##### CONNECTIONS #####

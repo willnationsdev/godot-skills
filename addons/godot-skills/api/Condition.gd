@@ -8,15 +8,12 @@ signal condition_expired(p_condition)
 
 ##### EXPORTS #####
 export(String) var condition_name = "" setget set_condition_name, get_condition_name # The name of the Condition
-export(NodePath) var on_add_skill_path = null       # The Skill activated upon addition to a SkillUser
-export(NodePath) var on_remove_skill_path = null    # The Skill activated upon removal from a SkillUser
-export(NodePath) var on_trigger_skill_path = null   # The Skill activated upon triggering
+export(NodePath) onready var on_add_skill = get_node(on_add_skill) # The Skill activated upon addition to a SkillUser
+export(NodePath) onready var on_remove_skill = get_node(on_remove_skill) # The Skill activated upon removal from a SkillUser
+export(NodePath) onready var on_trigger_skill = get_node(on_trigger_skill) # The Skill activated upon triggering
 export(bool) var hidden = false                     # If hidden, not added to SkillUser cache
 
 ##### MEMBERS #####
-var on_add_skill = null
-var on_remove_skill_path = null
-var on_trigger_skill_path = null
 var creator = null setget set_creator, get_creator  # The source SkillUser for this Condition
 
 ##### NOTIFICATIONS #####
@@ -25,6 +22,14 @@ func _init(p_creator = null):
 	is_signal_target = false
 	signals_to_update = ["condition_triggered", "condition_expired"]
 	creator = p_creator
+
+func _enter_tree():
+	if get_parent() and get_parent().has_method("get_conditions"):
+		get_parent().get_conditions().append(self)
+
+func _exit_tree():
+	if get_parent() and get_parent().has_method("get_conditions"):
+		get_parent().get_conditions().erase(self)
 
 ##### METHODS #####
 

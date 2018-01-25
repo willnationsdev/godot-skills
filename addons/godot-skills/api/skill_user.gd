@@ -7,29 +7,24 @@
 extends Node
 
 ##### SIGNALS #####
-signal condition_added(p_target, p_condition)
-signal condition_removed(p_target, p_condition)
+signal condition_added(p_source, p_condition)
+signal condition_removed(p_source, p_condition)
 
 signal skill_used(p_source, p_skill, p_params)
-signal skill_tested(p_source, p_skill, p_props)
+signal skill_tested(p_source, p_skill, p_params)
 
 ##### CONSTANTS #####
-const Filter = preload("Filter.gd")
-const TargetingSystem = preload("TargetingSystem.gd")
+const Filter = preload("filter.gd")
+const TargetingSystem = preload("targeting_system.gd")
 
 ##### EXPORTS #####
-export(NodePath) var actor_path = @"."
-export(NodePath) var stat_owner_path = @"."
-export(NodePath) var skills_path = @"skills"
-export(NodePath) var filters_path = @"filters"
-export(NodePath) var conditions_path = @"conditions"
-export(NodePath) var duplicates_path = @"duplicates"
+export(NodePath) var actor_path = @".."
+export(NodePath) var stat_owner_path = @".."
 
 ##### MEMBERS #####
-var skills = null
-var filters = null
-var conditions = null
-var duplicates = null
+var skills = []
+var filters = []
+var conditions = []
 var stat_owner = null setget set_stat_owner, get_stat_owner
 var actor = null setget set_actor, get_actor
 
@@ -38,10 +33,6 @@ var actor = null setget set_actor, get_actor
 func _ready():
 	set_actor(get_node(actor_path))
 	stat_owner = get_node(stat_owner_path)
-	skills = get_node(skills_path)
-	filters = get_node(filters_path)
-	conditions = get_node(conditions_path)
-	duplicates = get_node(duplicates_path)
 	get_tree().get_root().get_node(TargetingSystem.TSName).register_skill_user(self)
 
 func _die():

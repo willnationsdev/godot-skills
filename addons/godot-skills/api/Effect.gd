@@ -36,11 +36,11 @@ var _effects = [] setget , get_effects
 ##### NOTIFICATIONS #####
 
 func _enter_tree():
-	if get_parent().has_method("get_effects"):
+	if get_parent() and get_parent().has_method("get_effects"):
 		get_parent().get_effects().append(self)
 
 func _exit_tree():
-	if get_parent().has_method("get_effects"):
+	if get_parent() and get_parent().has_method("get_effects"):
 		get_parent().get_effects().erase(self)
 
 ##### OVERRIDES #####

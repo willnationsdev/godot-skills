@@ -19,6 +19,14 @@ func _init():
 	is_signal_target = false
 	signals_to_update = ["skill_filtered"]
 
+func _enter_tree():
+	if get_parent() and get_parent().has_method("get_filters"):
+		get_parent().get_filters().append(self)
+
+func _exit_tree():
+	if get_parent() and get_parent().has_method("get_filters"):
+		get_parent().get_filters().erase(self)
+
 ##### OVERRIDES #####
 
 ##### VIRTUALS #####

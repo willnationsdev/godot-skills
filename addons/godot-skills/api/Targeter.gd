@@ -18,7 +18,7 @@ extends "signal_updater.gd"
 signal target_found(p_targeter, p_target) # For REACTIVE targeting
 
 ##### CONSTANTS #####
-const TargetingSystem = preload("TargetingSystem.gd")
+const TargetingSystem = preload("targeting_system.gd")
 
 ##### EXPORTS #####
 export(bool) var uses_targeting_system = false
@@ -42,13 +42,13 @@ func _init():
 func _enter_tree():
 	if uses_targeting_system:
 		get_node("/root/"+TargetingSystem.TSName).register_targeter(self)
-	if get_parent().has_method("get_targeters"):
+	if get_parent() and get_parent().has_method("get_targeters"):
 		get_parent().get_targeters().append(self)
 
 func _exit_tree():
 	if uses_targeting_system:
 		get_node("/root/"+TargetingSystem.TSName).unregister_targeter(self)
-	if get_parent().has_method("get_targeters"):
+	if get_parent() and get_parent().has_method("get_targeters"):
 		get_parent().get_targeters().erase(self)
 
 ##### OVERRIDES #####

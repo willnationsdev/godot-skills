@@ -19,7 +19,7 @@ signal skill_applied(p_skill, p_source, p_target, p_params)            # Skill i
 signal test_target_found(p_skill, p_source, p_target_report, p_params) # For test instances of Skills
 
 ##### CONSTANTS #####
-const Skills = preload("godot_skills_utility.gd")
+const Util = preload("godot_skills_utility.gd")
 const SkillUserReport = preload("skill_user_report.gd")
 
 ##### EXPORTS #####
@@ -190,7 +190,7 @@ func get_targeting_system_id():
 func set_enabled(p_enable):
 	enabled = p_enable
 	if auto_deactivate_on_disable and not p_enable and _is_active:
-		deactivate(Skills.fetch_skill_user(self), {})
+		deactivate(Util.fetch_skill_user(self), {})
 
 func is_enabled():
 	return enabled
