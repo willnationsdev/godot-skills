@@ -14,13 +14,16 @@
 # AddConditionEffect:     Creates a Condition and adds it to the target SkillUser's list of Conditions
 # TriggerConditionEffect: Triggers the activation of a Condition attached to the target SkillUser.
 # RemoveConditionEffect:  Given a Condition, a number of instances (-1 for all) of that Condition are removed from the target SkillUser's list of Conditions.
-extends "signal_updater.gd"
+extends Node
 
 ##### CLASSES #####
 
 ##### SIGNALS #####
 
 ##### CONSTANTS #####
+
+const Util = preload("godot_skills_utility.gd")
+const SIGNALS = []
 
 ##### EXPORTS #####
 
@@ -36,12 +39,10 @@ var _effects = [] setget , get_effects
 ##### NOTIFICATIONS #####
 
 func _enter_tree():
-	if get_parent() and get_parent().has_method("get_effects"):
-		get_parent().get_effects().append(self)
+	Util.setup(self, true)
 
 func _exit_tree():
-	if get_parent() and get_parent().has_method("get_effects"):
-		get_parent().get_effects().erase(self)
+	Util.setup(self, false)
 
 ##### OVERRIDES #####
 
@@ -51,17 +52,17 @@ func _exit_tree():
 # @param p_source SkillUser                   Who instigated the Skill
 # @param p_target_report SkillUserReport      A report on the target SkillUser.
 # @param p_params Dictionary                  The parameters for the Skill that are defined at time of activation
-func _apply(p_source, p_target_report, p_params):
+func _apply(p_source, p_target_gitref, p_params):
 	pass
 
 ##### PUBLIC METHODS #####
 
 # Applies all child effects on the target and then its own effect.
-func apply(p_source, p_target, p_params):
+func apply(p_source, p_target_gitref, p_params):
 	for a_possible_effect in get_children():
 		if a_possible_effect.has_method("apply"):
-			a_possible_effect.apply(p_source, p_target, p_params)
-	_apply(p_source, p_target, p_params)
+			a_possible_effect.apply(p_source, p_target_gitref, p_params)
+	_apply(p_source, p_target_gitref, p_params)
 
 ##### PRIVATE METHODS #####
 

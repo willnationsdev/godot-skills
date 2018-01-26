@@ -10,6 +10,8 @@ extends Reference
 const Skill = preload("skill.gd")
 const SkillUser = preload("skill_user.gd")
 
+const CONNECTION_PREFIX = "_on_"
+
 ##### EXPORTS #####
 
 ##### MEMBERS #####
@@ -33,6 +35,23 @@ static func fetch_skill(p_node):
 	while ancestor and not ancestor is Skill:
 		ancestor = ancestor.get_parent()
 	return ancestor
+
+static func setup(p_node, p_is_entering):
+	# hook into parent cache
+	var parent = p_node.get_parent()
+	var type = p_node.get_script().resource_path.get_basename().get_file()
+	var getter = "get_" + type + "s"
+	if parent and parent.has_method(getter):
+		parent.call(getter).call("append" if p_is_entering else "erase", p_node)
+
+	# setup signals
+	var owner = p_node.get_owner()
+	var target = owner if owner else (parent if parent else null)
+	if target:
+		for a_signal in p_node.SIGNALS:
+			var method = CONNECTION_PREFIX + a_signal
+			if target.has_method(method):
+				p_node.call("connect" if p_connect else "disconnect", a_signal, owner, method)
 
 #static func search_res(p_regex):
 #	var files = {}

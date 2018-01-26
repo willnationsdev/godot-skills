@@ -2,12 +2,12 @@ tool
 extends EditorPlugin
 
 func _enter_tree():
-	add_custom_type("Effect", "Node", preload("api/Effect.gd"), preload("api/icons/icon_effect.png"))
-	add_custom_type("Targeter", "Node", preload("api/Targeter.gd"), preload("api/icons/icon_targeter.png"))
-	add_custom_type("Skill", "Node", preload("api/Skill.gd"), preload("api/icons/icon_skill.png"))
-	add_custom_type("Filter", "Node", preload("api/Filter.gd"), preload("api/icons/icon_filter.png"))
-	add_custom_type("Condition", "Node", preload("api/Condition.gd"), preload("api/icons/icon_condition.png"))
-	add_custom_type("SkillUser", "Node", preload("api/SkillUser.gd"), preload("api/icons/icon_skill_user.png"))
+	add_custom_type("Effect", "Node", preload("api/effect.gd"), preload("api/icons/icon_effect.png"))
+	add_custom_type("Targeter", "Node", preload("api/targeter.gd"), preload("api/icons/icon_targeter.png"))
+	add_custom_type("Skill", "Node", preload("api/skill.gd"), preload("api/icons/icon_skill.png"))
+	add_custom_type("Filter", "Node", preload("api/filter.gd"), preload("api/icons/icon_filter.png"))
+	add_custom_type("Condition", "Node", preload("api/condition.gd"), preload("api/icons/icon_condition.png"))
+	add_custom_type("SkillUser", "Node", preload("api/skill_user.gd"), preload("api/icons/icon_skill_user.png"))
 
 func _exit_tree():
 	remove_custom_type("SkillUser")

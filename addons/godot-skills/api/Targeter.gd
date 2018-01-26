@@ -10,7 +10,7 @@
 #                 Signals for area_entered and body_entered are then relayed to
 #                 target_found connections for the Targeter
 
-extends "signal_updater.gd"
+extends Node
 
 ##### CLASSES #####
 
@@ -19,6 +19,9 @@ signal target_found(p_targeter, p_target) # For REACTIVE targeting
 
 ##### CONSTANTS #####
 const TargetingSystem = preload("targeting_system.gd")
+const Skill = preload("skill.gd")
+
+const SIGNALS = ["target_found"]
 
 ##### EXPORTS #####
 export(bool) var uses_targeting_system = false
@@ -35,21 +38,15 @@ var _targeters = [] setget , get_targeters
 
 ##### NOTIFICATIONS #####
 
-func _init():
-	is_signal_target = false
-	signals_to_update = ["target_found"]
-
 func _enter_tree():
+	Util.setup(self, true)
 	if uses_targeting_system:
 		get_node("/root/"+TargetingSystem.TSName).register_targeter(self)
-	if get_parent() and get_parent().has_method("get_targeters"):
-		get_parent().get_targeters().append(self)
 
 func _exit_tree():
+	Util.setup(self, false)
 	if uses_targeting_system:
 		get_node("/root/"+TargetingSystem.TSName).unregister_targeter(self)
-	if get_parent() and get_parent().has_method("get_targeters"):
-		get_parent().get_targeters().erase(self)
 
 ##### OVERRIDES #####
 

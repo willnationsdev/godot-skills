@@ -8,7 +8,7 @@
 #     that the Targeter finds (at time of activation) or whether the Effects are applied to targets as
 #     the Targeter reports them via signal.
 
-extends "signal_updater.gd"
+extends Node
 
 ##### CLASSES #####
 
@@ -19,13 +19,19 @@ signal skill_applied(p_skill, p_source, p_target, p_params)            # Skill i
 signal test_target_found(p_skill, p_source, p_target_report, p_params) # For test instances of Skills
 
 ##### CONSTANTS #####
+
 const Util = preload("godot_skills_utility.gd")
 const SkillUserReport = preload("skill_user_report.gd")
+
+enum { FILTER_MODE_NONE=0, FILTER_MODE_TRIGGER=1, FILTER_MODE_ADD=2, FILTER_MODE_REMOVE=3 }
+
+const SIGNALS = ["skill_activated", "skill_deactivated", "skill_applied", "test_target_found"]
 
 ##### EXPORTS #####
 export var skill_name = "" setget set_skill_name, get_skill_name       # The name of the Skill, required
 export var enabled = true setget set_enabled, is_enabled               # If true, the skill will proactively apply to targets
 export var auto_deactivate_on_disable = true                           # If true, clearing 'enabled' will automatically call deactivate w/ p_params = {}
+export(int, "None", "Trigger", "Add", "Remove") var filter_mode = FILTER_MODE_NONE setget , get_filter_mode
 
 ##### MEMBERS #####
 
@@ -43,14 +49,11 @@ var _is_testing_instance = false
 
 ##### NOTIFICATIONS #####
 
-func _init():
-	is_signal_target = true
-	signals_to_update = ["skill_activated", "skill_deactivated", "skill_applied", "test_target_found"]
+func _enter_tree():
+	Util.setup(self, true)
 
-func _ready():
-	skills = get_node(skills_path)
-	effects = get_node(effects_path)
-	targeters = get_node(targeters_path)
+func _exit_tree():
+	Util.setup(self, false)
 
 ##### OVERRIDES #####
 
@@ -194,3 +197,6 @@ func set_enabled(p_enable):
 
 func is_enabled():
 	return enabled
+
+func get_filter_mode():
+	return filter_mode
