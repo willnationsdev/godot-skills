@@ -10,8 +10,8 @@ enum {
 	DELTA_TYPE_STRING=0
 	DELTA_TYPE_INT=1
 	DELTA_TYPE_REAL=2
-	DLETA_TYPE_BOOL=3
-	DLETA_TYPE_NODE_PATH=4
+	DELTA_TYPE_BOOL=3
+	DELTA_TYPE_NODE_PATH=4
 }
 
 export(String) var property_name = ""     # The property that will be changed on the target
